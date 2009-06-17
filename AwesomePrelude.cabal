@@ -1,0 +1,24 @@
+name:                AwesomePrelude
+version:             0.1.0
+synopsis:            Alternative Prelude, for designing deeply embedded DSLs
+description:         This alternative prelude is very much like the original
+                     Haskell Prelude, except that all data types have been
+                     replaced with type classes. This makes this prelude more
+                     extensible: Bring your own boolean implementation!
+license:             BSD3
+license-file:        LICENSE
+author:              Tom Lokhorst,
+                     Sebastiaan Visser
+maintainer:          Tom Lokhorst <tom@lokhorst.eu>
+homepage:            http://tom.lokhorst.eu/awesome-prelude
+stability:           Stable
+category:            Data
+build-type:          Simple
+cabal-version:       >= 1.6
+hs-source-dirs:      src
+exposed-modules:     AwesomePrelude,
+                     HaskellPrelude,
+                     JsPrelude,
+                     CsPrelude
+build-depends:       base >= 3 && < 5
+
