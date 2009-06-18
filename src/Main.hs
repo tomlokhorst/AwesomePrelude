@@ -25,12 +25,15 @@ f g a b = g a a b
 ok = f bool'
 -- epicfail = f bool
 
--- hoi = maybee false (not_) (just true :: JsC1 JsMaybe (Js JsBool))
+hi = maybe false not
+       (just true :: P.Maybe P.Bool)
+       -- (just true :: JsC1 JsMaybe (Js JsBool))
 
--- yo = eitherr (*5) (const 2) (right false :: JsC2 JsEither (Js JsNumber) (Js JsBool))
+yo = either (P.* 5) (P.const 2)
+       (right false :: P.Either P.Int P.Bool)
+       -- (right false :: JsC2 JsEither (Js JsNumber) (Js JsBool))
 
--- even' :: (Js JsNumber) -> (Js JsBool)
--- even' x = false
-
--- ahh = tuple2 (\x y -> x `and_` even' y) (ctuple2 true 3 :: JsC2 JsTuple2 (Js JsBool) (Js JsNumber))
+ah = tuple2 (\x y -> x && P.const false y)
+       (ctuple2 true 3 :: (,) P.Bool P.Int)
+       -- (ctuple2 true 3 :: JsC2 JsTuple2 (Js JsBool) (Js JsNumber))
 
