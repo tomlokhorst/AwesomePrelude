@@ -8,30 +8,30 @@ class Bool f r | f -> r where
   false :: f
   true  :: f
 
-if_ :: (Bool b r) => b -> r -> r -> r
-if_ p t f = bool f t p
+if' :: (Bool b r) => b -> r -> r -> r
+if' p t f = bool f t p
 
 (&&) :: (Bool b b) => b -> b -> b
-(&&) x y = if_ x y x
+(&&) x y = if' x y x
 
 (||) :: (Bool b b) => b -> b -> b
-(||) x y = if_ x x y
+(||) x y = if' x x y
 
 not :: (Bool b b) => b -> b
-not b = if_ b false true
+not b = if' b false true
 
-otherwise_ :: (Bool b b) => b
-otherwise_ = true
+otherwise :: (Bool b b) => b
+otherwise = true
 
 class Maybe f a r | f -> a, f -> r where
-  maybee  :: r -> (a -> r) -> f a -> r
+  maybe  :: r -> (a -> r) -> f a -> r
   nothing :: f a
   just    :: a -> f a
 
 class Either f a b r | f -> a, f -> b, f -> r where
-  eitherr :: (a -> r) -> (b -> r) -> f a b -> r
-  left    :: a -> f a b
-  right   :: b -> f a b
+  either :: (a -> r) -> (b -> r) -> f a b -> r
+  left   :: a -> f a b
+  right  :: b -> f a b
 
 class Tuple2 f a b r | f -> a, f -> b, f -> r where
   tuple2  :: (a -> b -> r) -> f a b -> r

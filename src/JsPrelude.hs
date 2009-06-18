@@ -58,7 +58,7 @@ instance Bool (Js JsBool) (Js r) where
 data JsMaybe a
 
 instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
-  maybee x f m =
+  maybe  x f m =
     let m'      = unJsC1 m
         patJust = Destruct "(function (x) x.just)" m'
     in prim3 "(function(x, y, m) m.just === undefined ? x : y)" x (f patJust) m'
@@ -79,7 +79,7 @@ instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
 data JsEither a b
 
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
-  eitherr f g e =
+  either f g e =
     let e'       = unJsC2 e
         patLeft  = Destruct "(function (x) x.left)" e'
         patRight = Destruct "(function (x) x.left)" e'

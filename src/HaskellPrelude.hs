@@ -12,14 +12,14 @@ instance Bool P.Bool r where
   false      = P.False
 
 instance Maybe P.Maybe a r where
-  maybee  = P.maybe
+  maybe   = P.maybe
   nothing = P.Nothing
   just    = P.Just
 
 instance Either P.Either a b r where
-  eitherr = P.either
-  left    = P.Left
-  right   = P.Right
+  either = P.either
+  left   = P.Left
+  right  = P.Right
 
 instance Tuple2 (,) a b r where
   tuple2  f (x, y) = f x y
