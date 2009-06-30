@@ -9,12 +9,30 @@ import JsPrelude
 import Prelude (Int, fromInteger)
 import qualified Prelude as P
 
-testy :: [Int]
-testy = 3 `cons` (4 `cons` nil)
 
--- test :: P.Bool
-test :: Js JsBool
+-- Switch between these two types to see the AwesomePrelude in action!
+
+
+-- test :: Js JsBool
+test :: P.Bool
 test = not false && false || true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+listy :: [Int]
+listy = 3 `cons` (4 `cons` nil)
 
 bool' :: a -> a -> P.Bool -> a
 bool' x y b = if b then x else y
