@@ -25,19 +25,22 @@ instance Tuple2 (,) a b r where
   tuple2  f (x, y) = f x y
   ctuple2 x y      = (x, y)
 
-instance Eq P.Ordering where
-  x == y = if x P.== y then true else false
+instance Eq () where
+  () == () = true
 
-instance Ordering P.Ordering r where
-  ordering x _ _ P.LT = x
-  ordering _ y _ P.EQ = y
-  ordering _ _ z P.GT = z
-  lt                  = P.LT
-  eq                  = P.EQ
-  gt                  = P.GT
-
-instance List [] a r where
-  list = \x f ys -> P.foldr f x ys
-  nil  = []
-  cons = (:)
+-- instance Eq P.Ordering where
+--   x == y = if x P.== y then true else false
+-- 
+-- instance Ordering P.Ordering r where
+--   ordering x _ _ P.LT = x
+--   ordering _ y _ P.EQ = y
+--   ordering _ _ z P.GT = z
+--   lt                  = P.LT
+--   eq                  = P.EQ
+--   gt                  = P.GT
+-- 
+-- instance List [] a r where
+--   list = \x f ys -> P.foldr f x ys
+--   nil  = []
+--   cons = (:)
 

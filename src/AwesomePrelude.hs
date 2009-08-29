@@ -3,6 +3,9 @@
 
 module AwesomePrelude where
 
+undefined :: a
+undefined = undefined
+
 class Bool f r | f -> r where
   bool  :: r -> r -> f -> r
   false :: f
@@ -17,11 +20,8 @@ if' p t f = bool f t p
 (||) :: (Bool b b) => b -> b -> b
 (||) x y = if' x x y
 
-not :: (Bool b b) => b -> b
-not b = if' b false true
-
-otherwise :: (Bool b b) => b
-otherwise = true
+-- otherwise :: (Bool b b) => b
+-- otherwise = true
 
 class Maybe f a r | f -> a, f -> r where
   maybe  :: r -> (a -> r) -> f a -> r
@@ -49,33 +49,36 @@ curry f x y = f (ctuple2 x y)
 uncurry :: (Tuple2 f a b r) => (a -> b -> r) -> f a b -> r
 uncurry f t = tuple2 f t
 
+not :: (Bool b b', Bool b' r) => b -> b'
+not b = if' b false true
+
 class Eq a where
-  (==), (/=) :: Bool b b => a -> a -> b
+  (==), (/=) :: Bool b r => a -> a -> b
   
   x /= y = not (x == y)
   x == y = not (x /= y)
 
-class (Eq f) => Ordering f r | f -> r where
-  ordering :: r -> r -> r -> f -> r
-  lt       :: f
-  eq       :: f
-  gt       :: f
+-- class (Eq f) => Ordering f r | f -> r where
+--   ordering :: r -> r -> r -> f -> r
+--   lt       :: f
+--   eq       :: f
+--   gt       :: f
 
-isLt :: (Ordering o b, Bool b r) => o -> b
-isLt = ordering true  false false
+-- isLt :: (Ordering o b, Bool b r) => o -> b
+-- isLt = ordering true  false false
+-- 
+-- isEq :: (Ordering o b, Bool b r) => o -> b
+-- isEq = ordering false true  false
 
-isEq :: (Ordering o b, Bool b r) => o -> b
-isEq = ordering false true  false
-
-isGt :: (Ordering o b, Bool b r) => o -> b
-isGt = ordering false false true
+-- isGt :: (Ordering o b, Bool b r) => o -> b
+-- isGt = ordering false false true
 
 
-class (Eq a) => Ord a where
-  compare              :: (Bool o o, Ordering o r) => a -> a -> o
-  (<), (<=), (>), (>=) :: Ordering o r => a -> a -> o
-
-  max, min             :: a -> a -> a
+-- class (Eq a) => Ord a where
+--   compare              :: (Bool o o, Ordering o r) => a -> a -> o
+--   (<), (<=), (>), (>=) :: Ordering o r => a -> a -> o
+-- 
+--   max, min             :: a -> a -> a
 
 --  compare x y = bool eq lt (x == x) --if_ (x == y)
 --                    eq lt
