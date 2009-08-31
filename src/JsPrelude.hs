@@ -1,5 +1,10 @@
-{-# LANGUAGE GADTs, EmptyDataDecls, FlexibleInstances, MultiParamTypeClasses
-           , UndecidableInstances #-}
+{-# LANGUAGE
+    GADTs
+  , EmptyDataDecls
+  , FlexibleInstances
+  , MultiParamTypeClasses
+  , UndecidableInstances
+ #-}
 
 module JsPrelude where
 
@@ -10,7 +15,6 @@ import Data.List
 
 newtype JsC1 f a   = JsC1 { unJsC1 :: Js (f a) }
 newtype JsC2 f a b = JsC2 { unJsC2 :: Js (f a b) }
-
 
 data Js a where
   Prim     :: String -> Js a
@@ -25,11 +29,6 @@ prim2 f a b = Prim f `App` a `App` b
 
 prim3 :: String -> Js a -> Js b -> Js c -> Js d 
 prim3 f a b c = Prim f `App` a `App` b `App` c
-
--- instance Eq (Js a) where
---   (Prim s1)       == (Prim s2)       = s1 == s2
---   (Destruct s1 x) == (Destruct s2 y) = s1 == s2 && x == y
---   _               == _               = False
 
 instance Show (Js a) where
   show = showJs
@@ -88,6 +87,16 @@ instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   right r = JsC2 (prim "(function (x) { return {right : x }})" r)
 
 data JsNumber
+
+jsEq :: Js a -> Js a -> Js JsBool
+jsEq a b = Prim "function (a, b) { return a === b; }" `App` a `App` b
+
+jsNeq :: Js a -> Js a -> Js JsBool
+jsNeq a b = Prim "function (a, b) { return a !== b; }" `App` a `App` b
+
+instance Eq (Js JsBool) (Js JsBool) where
+  (==) = jsEq
+  (/=) = jsNeq
 
 -- instance Num (Js JsNumber) where
 --   (+) = prim2 "(function(a,b){return a+b})"

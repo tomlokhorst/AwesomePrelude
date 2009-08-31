@@ -14,9 +14,11 @@ import qualified Prelude as P
 
 
 -- test :: Js JsBool
-test :: P.Bool
-test = not false && false || true
+-- test :: P.Bool
+-- test = not false && false || true
 
+kk :: Js JsBool
+kk = (not (true :: Js JsBool) :: Js JsBool)
 
 
 

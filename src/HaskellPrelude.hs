@@ -25,9 +25,6 @@ instance Tuple2 (,) a b r where
   tuple2  f (x, y) = f x y
   ctuple2 x y      = (x, y)
 
-instance Eq () where
-  () == () = true
-
 -- instance Eq P.Ordering where
 --   x == y = if x P.== y then true else false
 -- 
