@@ -16,7 +16,8 @@ f :: Js JsBool -> Js JsBool
 --f :: P.Bool -> P.Bool
 f x = not x && false || true
 
-test = f true
+test :: Js JsBool
+test = true || false && f false
 
 -- kk :: Js JsBool
 -- kk = (not (true :: Js JsBool) :: Js JsBool)

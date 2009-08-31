@@ -19,6 +19,8 @@ newtype JsC2 f a b = JsC2 { unJsC2 :: Js (f a b) }
 data Js a where
   Prim     :: P.String -> Js a
   App      :: Js (a -> b) -> Js a -> Js b
+  BinOp    :: P.String -> Js a -> Js b -> Js c
+  TriOp    :: P.String -> P.String -> Js a -> Js b -> Js c -> Js d
   Destruct :: P.String -> Js f -> Js a
 
 prim :: P.String -> Js a -> Js b
@@ -34,27 +36,31 @@ instance P.Show (Js a) where
   show = showJs
 
 showJs :: Js a -> P.String
-showJs (Prim s)       = s
-showJs (Destruct s x) = P.show (App (Prim s) x)
-showJs p@(App f x)    = fun p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
+showJs (BinOp s   a b)   = "(" P.++ showJs a P.++ s P.++ showJs b P.++ ")"
+showJs (TriOp s t a b c) = "(" P.++ showJs a P.++ s P.++ showJs b P.++ t P.++ showJs c P.++ ")"
+showJs (Prim s)          = s
+showJs (Destruct s x)    = P.show (App (Prim s) x)
+showJs p@(App _ _)       = fun p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
   where
     fun :: Js a -> P.String
     fun (App f _) = fun f
     fun x         = showJs x
 
     args :: Js a -> [P.String]
-    args (App f a) = args f P.++ [showJs a]
-    args _         = []
+    args (App f' a) = args f' P.++ [showJs a]
+    args _          = []
  
 
 data JsBool
+data JsMaybe a
+data JsTuple2 a b
+data JsEither a b
+data JsNumber
 
 instance Bool (Js JsBool) (Js r) where
-  bool f t x = prim3 "(function (f, t, x) x ? t : f)" f t x
-  true       = Prim "true"
-  false      = Prim "false"
-
-data JsMaybe a
+  bool  = TriOp "?" ":"
+  true  = Prim "true"
+  false = Prim "false"
 
 instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
   maybe  x f m =
@@ -64,9 +70,6 @@ instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
   nothing = JsC1 (Prim "{ }")
   just x  = JsC1 (prim "(function (x) { return { just : x }})" x)
 
-
-data JsTuple2 a b
-
 instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
   tuple2 f p =
     let p' = unJsC2 p
@@ -74,8 +77,6 @@ instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
         patSnd = Destruct ("(function (p) p.snd)") p'
     in prim "(function (z, p) z)" (f patFst patSnd)
   ctuple2 x y = JsC2 (prim2 "(function (x, y) { return { fst : x, snd : y }})" x y)
-
-data JsEither a b
 
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   either f g e =
@@ -86,21 +87,13 @@ instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   left l  = JsC2 (prim "(function (x) { return { left : x }})" l)
   right r = JsC2 (prim "(function (x) { return {right : x }})" r)
 
-data JsNumber
-
-jsEq :: Js a -> Js a -> Js JsBool
-jsEq a b = Prim "function (a, b) { return a === b; }" `App` a `App` b
-
-jsNeq :: Js a -> Js a -> Js JsBool
-jsNeq a b = Prim "function (a, b) { return a !== b; }" `App` a `App` b
-
 instance Eq (Js JsBool) (Js JsBool) where
-  (==) = jsEq
-  (/=) = jsNeq
+  (==) = BinOp "==="
+  (/=) = BinOp "!=="
 
 instance Eq (Js JsNumber) (Js JsBool) where
-  (==) = jsEq
-  (/=) = jsNeq
+  (==) = BinOp "==="
+  (/=) = BinOp "!=="
 
 -- instance Num (Js JsNumber) where
 --   (+) = prim2 "(function(a,b){return a+b})"
