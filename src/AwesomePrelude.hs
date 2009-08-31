@@ -10,8 +10,6 @@
 
 module AwesomePrelude where
 
-import qualified Prelude as P
-
 undefined :: a
 undefined = undefined
 
@@ -20,7 +18,7 @@ class Bool f r | f -> r where
   false :: f
   true  :: f
 
-if' :: (Bool b r) => b -> r -> r -> r
+if' :: Bool b r => b -> r -> r -> r
 if' p t f = bool f t p
 
 (&&) :: Bool b b => b -> b -> b
@@ -29,11 +27,11 @@ if' p t f = bool f t p
 (||) :: Bool b b => b -> b -> b
 (||) x y = if' x x y
 
--- otherwise :: (Bool b b) => b
--- otherwise = true
+otherwise :: Bool b r => b
+otherwise = true
 
 class Maybe f a r | f -> a, f -> r where
-  maybe  :: r -> (a -> r) -> f a -> r
+  maybe   :: r -> (a -> r) -> f a -> r
   nothing :: f a
   just    :: a -> f a
 
@@ -61,15 +59,8 @@ uncurry f t = tuple2 f t
 not :: (Bool b b', Bool b' r) => b -> b'
 not b = if' b false true
 
-class Eq a b where
+class Eq a b | a -> b where
   (==), (/=) :: Bool b r => a -> a -> b
-
--- notis :: forall a b r. (Eq a, Bool b b, Bool b r) => a -> a -> b
--- notis x y = not (x == y :: b) :: b
-
--- notnot :: forall a b r. (Eq a, Bool b b, Bool b r) => a -> a -> b
--- notnot x y = not (x /= y :: b) :: b
-
 
 
 -- class (Eq f) => Ordering f r | f -> r where

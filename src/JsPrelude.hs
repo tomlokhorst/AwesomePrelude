@@ -10,41 +10,41 @@ module JsPrelude where
 
 import AwesomePrelude
 import qualified Prelude as P
-import Prelude hiding (Maybe, Either, Bool, Eq, (==), (&&), (++))
+--import Prelude hiding (Maybe, Either, Bool, Eq, (==), (&&), (++))
 import Data.List
 
 newtype JsC1 f a   = JsC1 { unJsC1 :: Js (f a) }
 newtype JsC2 f a b = JsC2 { unJsC2 :: Js (f a b) }
 
 data Js a where
-  Prim     :: String -> Js a
+  Prim     :: P.String -> Js a
   App      :: Js (a -> b) -> Js a -> Js b
-  Destruct :: String -> Js f -> Js a
+  Destruct :: P.String -> Js f -> Js a
 
-prim :: String -> Js a -> Js b
+prim :: P.String -> Js a -> Js b
 prim f a = Prim f `App` a
 
-prim2 :: String -> Js a -> Js b -> Js c 
+prim2 :: P.String -> Js a -> Js b -> Js c 
 prim2 f a b = Prim f `App` a `App` b
 
-prim3 :: String -> Js a -> Js b -> Js c -> Js d 
+prim3 :: P.String -> Js a -> Js b -> Js c -> Js d 
 prim3 f a b c = Prim f `App` a `App` b `App` c
 
-instance Show (Js a) where
+instance P.Show (Js a) where
   show = showJs
 
-showJs :: Js a -> String
-showJs (Prim s)     = s
-showJs (Destruct s x) = show (App (Prim s) x)
-showJs p@(App f x)  = fun p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
- where
-  fun :: Js a -> String
-  fun (App f _) = fun f
-  fun x         = showJs x
+showJs :: Js a -> P.String
+showJs (Prim s)       = s
+showJs (Destruct s x) = P.show (App (Prim s) x)
+showJs p@(App f x)    = fun p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
+  where
+    fun :: Js a -> P.String
+    fun (App f _) = fun f
+    fun x         = showJs x
 
-  args :: Js a -> [String]
-  args (App f a) = args f P.++ [showJs a]
-  args _         = []
+    args :: Js a -> [P.String]
+    args (App f a) = args f P.++ [showJs a]
+    args _         = []
  
 
 data JsBool
@@ -95,6 +95,10 @@ jsNeq :: Js a -> Js a -> Js JsBool
 jsNeq a b = Prim "function (a, b) { return a !== b; }" `App` a `App` b
 
 instance Eq (Js JsBool) (Js JsBool) where
+  (==) = jsEq
+  (/=) = jsNeq
+
+instance Eq (Js JsNumber) (Js JsBool) where
   (==) = jsEq
   (/=) = jsNeq
 

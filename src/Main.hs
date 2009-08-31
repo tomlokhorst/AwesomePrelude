@@ -12,13 +12,14 @@ import qualified Prelude as P
 
 -- Switch between these two types to see the AwesomePrelude in action!
 
+f :: Js JsBool -> Js JsBool
+--f :: P.Bool -> P.Bool
+f x = not x && false || true
 
--- test :: Js JsBool
--- test :: P.Bool
--- test = not false && false || true
+test = f true
 
-kk :: Js JsBool
-kk = (not (true :: Js JsBool) :: Js JsBool)
+-- kk :: Js JsBool
+-- kk = (not (true :: Js JsBool) :: Js JsBool)
 
 
 
