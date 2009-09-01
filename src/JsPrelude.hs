@@ -40,22 +40,24 @@ showJs (BinOp s   a b)   = "(" P.++ showJs a P.++ s P.++ showJs b P.++ ")"
 showJs (TriOp s t a b c) = "(" P.++ showJs a P.++ s P.++ showJs b P.++ t P.++ showJs c P.++ ")"
 showJs (Prim s)          = s
 showJs (Destruct s x)    = P.show (App (Prim s) x)
-showJs p@(App _ _)       = fun p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
+showJs p@(App _ _)       = fu p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
   where
-    fun :: Js a -> P.String
-    fun (App f _) = fun f
-    fun x         = showJs x
+    fu :: Js a -> P.String
+    fu (App f _) = fu f
+    fu x         = showJs x
 
     args :: Js a -> [P.String]
     args (App f' a) = args f' P.++ [showJs a]
     args _          = []
- 
 
 data JsBool
 data JsMaybe a
 data JsTuple2 a b
 data JsEither a b
 data JsNumber
+
+fun :: [P.String] -> P.String -> P.String
+fun ps ret = "(function (" P.++ intercalate ", " ps P.++ "){ return " P.++ ret P.++ "})"
 
 instance Bool (Js JsBool) (Js r) where
   bool  = TriOp "?" ":"
@@ -65,27 +67,27 @@ instance Bool (Js JsBool) (Js r) where
 instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
   maybe  x f m =
     let m'      = unJsC1 m
-        patJust = Destruct "(function (x) x.just)" m'
-    in prim3 "(function(x, y, m) m.just === undefined ? x : y)" x (f patJust) m'
-  nothing = JsC1 (Prim "{ }")
-  just x  = JsC1 (prim "(function (x) { return { just : x }})" x)
+        patJust = Destruct (fun ["x"] "x.just") m'
+    in prim3 (fun ["x", "y", "m"] "m.just === undefined ? x : y") x (f patJust) m'
+  nothing = JsC1 (Prim "{/*Nothing*/}")
+  just x  = JsC1 (prim (fun ["x"] "just : x") x)
 
 instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
   tuple2 f p =
     let p' = unJsC2 p
-        patFst = Destruct ("(function (p) p.fst)") p'
-        patSnd = Destruct ("(function (p) p.snd)") p'
-    in prim "(function (z, p) z)" (f patFst patSnd)
-  ctuple2 x y = JsC2 (prim2 "(function (x, y) { return { fst : x, snd : y }})" x y)
+        patFst = Destruct (fun ["p"] "p.fst") p'
+        patSnd = Destruct (fun ["p"] "p.snd") p'
+    in prim (fun ["z", "p"] "z") (f patFst patSnd)
+  ctuple2 x y = JsC2 (prim2 (fun ["x", "y"] "{ fst : x, snd : y }") x y)
 
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   either f g e =
     let e'       = unJsC2 e
-        patLeft  = Destruct "(function (x) x.left)" e'
-        patRight = Destruct "(function (x) x.left)" e'
-    in prim3 "(function (x, y, e) e.right === undefined ? x : y)" (f patLeft) (g patRight) e'
-  left l  = JsC2 (prim "(function (x) { return { left : x }})" l)
-  right r = JsC2 (prim "(function (x) { return {right : x }})" r)
+        patLeft  = Destruct (fun ["x"] "x.left")  e'
+        patRight = Destruct (fun ["x"] "x.right") e'
+    in prim3 (fun ["x", "y", "e"] "e.right === undefined ? x : y") (f patLeft) (g patRight) e'
+  left l  = JsC2 (prim (fun ["x"] "{left  : x}") l)
+  right r = JsC2 (prim (fun ["x"] "{right : x}") r)
 
 instance Eq (Js JsBool) (Js JsBool) where
   (==) = BinOp "==="

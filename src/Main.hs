@@ -6,7 +6,7 @@ import AwesomePrelude
 import HaskellPrelude
 import JsPrelude
 
-import Prelude (Int, fromInteger)
+import Prelude (Int)
 import qualified Prelude as P
 
 
