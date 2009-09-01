@@ -53,6 +53,12 @@ showJs p@(App _ _)       = fu p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
     args (App f' a) = args f' P.++ [showJs a]
     args _          = []
 
+instance P.Show (f a) => P.Show (JsC1 f a) where
+  show jc = P.show (unJsC1 jc)
+
+instance P.Show a => P.Show (JsList a) where
+  show ls = P.show ls
+
 data JsBool
 data JsNumber
 data JsMaybe a
@@ -89,7 +95,7 @@ instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
     let m'      = unJsC1 m
         patJust = Destruct (fun ["x"] "x.just") m'
     in prim3 (fun ["x", "y", "m"] "m.just === undefined ? x : y") x (f patJust) m'
-  nothing = JsC1 (Prim "{/*Nothing*/}")
+  nothing = JsC1 (Prim "\"nothing\"")
   just x  = JsC1 (prim (fun ["x"] "just : x") x)
 
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
@@ -107,17 +113,21 @@ instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
         patFst = Destruct (fun ["p"] "p.fst") p'
         patSnd = Destruct (fun ["p"] "p.snd") p'
     in prim2 (fun ["z", "p"] "z") (f patFst patSnd) p'
+  -- ctuple2 :: a -> b -> f a b
   ctuple2 x y = JsC2 (prim2 (fun ["x", "y"] "{ fst : x, snd : y }") x y)
 
--- instance List (JsC1 JsList) (Js a) (Js r) where
---   -- list :: r -> (a -> r -> r) -> f a -> r
---   list x f ys =
---     let ys'     = unJsC1 ys
---         patCons = Destruct "(function (x) x.cons)" ys'
---     in prim3 "(function (x, y, zs) zs.cons === undefined ? x : y" x (f patCons undefined) ys'
---   nil = JsC1 (Prim "{ }")
---   -- cons :: a -> f a -> f a
---   cons x xs = JsC2 (prim2 "(function (x, xs) { return { head : x, tail : xs }" x xs)
+instance List (JsC1 JsList) (Js a) (Js r) where
+  -- list :: r -> (a -> r -> r) -> f a -> r
+  list x f ys =
+    let ys'     = unJsC1 ys
+        patHead = Destruct (fun ["l"] "x.head") ys'
+        patTail = Destruct (fun ["l"] "x.tail") ys'
+    in prim3 (fun ["x", "y", "zs"] "zs.head === undefined ? x : y") x (f patHead patTail) ys'
+  nil = JsC1 (Prim "\"nil\"")
+  -- cons :: a -> f a -> f a
+  cons x xs =
+    let xs'  = unJsC1 xs
+    in JsC1 (prim2 (fun ["x", "xs"] "{ head : x, tail : xs }") x xs')
 
 -- * JavaScript instances of AwesomePrelude 'type classes'
 

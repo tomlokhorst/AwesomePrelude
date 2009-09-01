@@ -47,7 +47,8 @@ test4 = fM (just true)
 
 
 
-listy :: [P.Int]
+listy :: JsC1 JsList (Js JsNumber)
+--listy :: [P.Int]
 listy = 3 `cons` (4 `cons` nil)
 
 bool' :: a -> a -> P.Bool -> a
