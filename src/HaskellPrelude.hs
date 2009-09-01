@@ -1,4 +1,8 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE
+    FlexibleInstances
+  , MultiParamTypeClasses
+  , UndecidableInstances
+ #-}
 
 module HaskellPrelude where
 

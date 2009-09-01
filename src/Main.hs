@@ -1,4 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude, RankNTypes #-}
+{-# LANGUAGE
+    NoImplicitPrelude
+  , RankNTypes
+ #-}
 
 module Main where
 
@@ -10,17 +13,13 @@ import Prelude (Int)
 import qualified Prelude as P
 
 
--- Switch between these two types to see the AwesomePrelude in action!
+-- Switch between these two types and run `test` to see the AwesomePrelude in action!
 
 f :: Js JsBool -> Js JsBool
 --f :: P.Bool -> P.Bool
 f x = not x && false || true
 
-test :: Js JsBool
-test = true || false && f false
-
--- kk :: Js JsBool
--- kk = (not (true :: Js JsBool) :: Js JsBool)
+test = f true
 
 
 
