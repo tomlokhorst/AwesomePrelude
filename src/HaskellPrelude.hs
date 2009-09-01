@@ -7,8 +7,9 @@
 module HaskellPrelude where
 
 import AwesomePrelude
-
 import qualified Prelude as P
+
+-- * Haskell instances for AwesomePrelude 'data types'
 
 instance Bool P.Bool r where 
   bool f t x = if x then t else f
@@ -39,9 +40,19 @@ instance Tuple2 (,) a b r where
 --   lt                  = P.LT
 --   eq                  = P.EQ
 --   gt                  = P.GT
--- 
--- instance List [] a r where
---   list = \x f ys -> P.foldr f x ys
---   nil  = []
---   cons = (:)
+
+instance List [] a r where
+  list = \x f ys -> P.foldr f x ys
+  nil  = []
+  cons = (:)
+
+-- * Haskell instances of AwesomePrelude 'type classes'
+
+instance Eq P.Bool P.Bool where
+  (==) = (P.==)
+  (/=) = (P./=)
+
+instance Eq P.Int P.Bool where
+  (==) = (P.==)
+  (/=) = (P./=)
 

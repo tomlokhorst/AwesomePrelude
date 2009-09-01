@@ -10,8 +10,9 @@ module JsPrelude where
 
 import AwesomePrelude
 import qualified Prelude as P
---import Prelude hiding (Maybe, Either, Bool, Eq, (==), (&&), (++))
 import Data.List
+
+-- * JavaScript DSL
 
 newtype JsC1 f a   = JsC1 { unJsC1 :: Js (f a) }
 newtype JsC2 f a b = JsC2 { unJsC2 :: Js (f a b) }
@@ -59,6 +60,19 @@ data JsNumber
 fun :: [P.String] -> P.String -> P.String
 fun ps ret = "(function (" P.++ intercalate ", " ps P.++ "){ return " P.++ ret P.++ "})"
 
+-- Terible hack to get numeric literals to work
+
+instance P.Num (Js JsNumber) where
+  (+)    = P.error "You shouldn't use this"
+  (*)    = P.error "You shouldn't use this"
+  abs    = P.error "You shouldn't use this"
+  signum = P.error "You shouldn't use this"
+  fromInteger x = Prim (P.show x)
+
+instance P.Eq (Js JsNumber) where
+
+-- * JavaScript instances for AwesomePrelude 'data types'
+
 instance Bool (Js JsBool) (Js r) where
   bool  = TriOp "?" ":"
   true  = Prim "true"
@@ -72,14 +86,6 @@ instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
   nothing = JsC1 (Prim "{/*Nothing*/}")
   just x  = JsC1 (prim (fun ["x"] "just : x") x)
 
-instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
-  tuple2 f p =
-    let p' = unJsC2 p
-        patFst = Destruct (fun ["p"] "p.fst") p'
-        patSnd = Destruct (fun ["p"] "p.snd") p'
-    in prim (fun ["z", "p"] "z") (f patFst patSnd)
-  ctuple2 x y = JsC2 (prim2 (fun ["x", "y"] "{ fst : x, snd : y }") x y)
-
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   either f g e =
     let e'       = unJsC2 e
@@ -88,6 +94,16 @@ instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
     in prim3 (fun ["x", "y", "e"] "e.right === undefined ? x : y") (f patLeft) (g patRight) e'
   left l  = JsC2 (prim (fun ["x"] "{left  : x}") l)
   right r = JsC2 (prim (fun ["x"] "{right : x}") r)
+
+instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
+  tuple2 f p =
+    let p' = unJsC2 p
+        patFst = Destruct ("(function (p) p.fst)") p'
+        patSnd = Destruct ("(function (p) p.snd)") p'
+    in prim "(function (z, p) z)" (f patFst patSnd)
+  ctuple2 x y = JsC2 (prim2 "(function (x, y) { return { fst : x, snd : y }})" x y)
+
+-- * JavaScript instances of AwesomePrelude 'type classes'
 
 instance Eq (Js JsBool) (Js JsBool) where
   (==) = BinOp "==="
