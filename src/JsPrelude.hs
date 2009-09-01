@@ -20,6 +20,7 @@ newtype JsC2 f a b = JsC2 { unJsC2 :: Js (f a b) }
 data Js a where
   Prim     :: P.String -> Js a
   App      :: Js (a -> b) -> Js a -> Js b
+  PreOp    :: P.String -> Js a -> Js b
   BinOp    :: P.String -> Js a -> Js b -> Js c
   TriOp    :: P.String -> P.String -> Js a -> Js b -> Js c -> Js d
   Destruct :: P.String -> Js f -> Js a
@@ -37,6 +38,7 @@ instance P.Show (Js a) where
   show = showJs
 
 showJs :: Js a -> P.String
+showJs (PreOp s   a)     = "(" P.++ s P.++ showJs a P.++ ")"
 showJs (BinOp s   a b)   = "(" P.++ showJs a P.++ s P.++ showJs b P.++ ")"
 showJs (TriOp s t a b c) = "(" P.++ showJs a P.++ s P.++ showJs b P.++ t P.++ showJs c P.++ ")"
 showJs (Prim s)          = s
@@ -64,13 +66,15 @@ fun ps ret = "(function (" P.++ intercalate ", " ps P.++ "){ return " P.++ ret P
 -- Terible hack to get numeric literals to work
 
 instance P.Num (Js JsNumber) where
-  (+)    = P.error "You shouldn't use this"
-  (*)    = P.error "You shouldn't use this"
-  abs    = P.error "You shouldn't use this"
-  signum = P.error "You shouldn't use this"
+  (+)           = BinOp "+"
+  (*)           = BinOp "*"
+  abs           = prim (fun ["x"] "Math.abs(x)")
+  signum        = PreOp "-"
   fromInteger x = Prim (P.show x)
 
 instance P.Eq (Js JsNumber) where
+  (==) = P.error "Prelude.Eq shouldn't be used with the AwesomePrelude"
+  (/=) = P.error "Prelude.Eq shouldn't be used with the AwesomePrelude"
 
 
 -- * JavaScript instances for AwesomePrelude 'data types'
@@ -91,37 +95,29 @@ instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   either f g e =
     let e'       = unJsC2 e
-<<<<<<< HEAD:src/JsPrelude.hs
         patLeft  = Destruct (fun ["x"] "x.left")  e'
         patRight = Destruct (fun ["x"] "x.right") e'
     in prim3 (fun ["x", "y", "e"] "e.right === undefined ? x : y") (f patLeft) (g patRight) e'
   left l  = JsC2 (prim (fun ["x"] "{left  : x}") l)
   right r = JsC2 (prim (fun ["x"] "{right : x}") r)
-=======
-        patLeft  = Destruct "(function (x) x.left)"  e'
-        patRight = Destruct "(function (x) x.right)" e'
-    in prim3 "(function (x, y, e) e.right === undefined ? x : y)" (f patLeft) (g patRight) e'
-  left l  = JsC2 (prim "(function (x) { return { left : x }})" l)
-  right r = JsC2 (prim "(function (x) { return {right : x }})" r)
->>>>>>> Moved stuff around:src/JsPrelude.hs
 
 instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
   tuple2 f p =
     let p' = unJsC2 p
-        patFst = Destruct "(function (p) p.fst)" p'
-        patSnd = Destruct "(function (p) p.snd)" p'
-    in prim "(function (z, p) z)" (f patFst patSnd)
-  ctuple2 x y = JsC2 (prim2 "(function (x, y) { return { fst : x, snd : y }})" x y)
+        patFst = Destruct (fun ["p"] "p.fst") p'
+        patSnd = Destruct (fun ["p"] "p.snd") p'
+    in prim2 (fun ["z", "p"] "z") (f patFst patSnd) p'
+  ctuple2 x y = JsC2 (prim2 (fun ["x", "y"] "{ fst : x, snd : y }") x y)
 
-instance List (JsC1 JsList) (Js a) (Js r) where
-  -- list :: r -> (a -> r -> r) -> f a -> r
-  list x f ys =
-    let ys'     = unJsC1 ys
-        patCons = Destruct "(function (x) x.cons)" ys'
-    in prim3 "(function (x, y, zs) zs.cons === undefined ? x : y" x (f patCons undefined) ys'
-  nil = JsC1 (Prim "{ }")
-  -- cons :: a -> f a -> f a
-  cons x xs = JsC2 (prim2 "(function (x, xs) { return { head : x, tail : xs }" x xs)
+-- instance List (JsC1 JsList) (Js a) (Js r) where
+--   -- list :: r -> (a -> r -> r) -> f a -> r
+--   list x f ys =
+--     let ys'     = unJsC1 ys
+--         patCons = Destruct "(function (x) x.cons)" ys'
+--     in prim3 "(function (x, y, zs) zs.cons === undefined ? x : y" x (f patCons undefined) ys'
+--   nil = JsC1 (Prim "{ }")
+--   -- cons :: a -> f a -> f a
+--   cons x xs = JsC2 (prim2 "(function (x, xs) { return { head : x, tail : xs }" x xs)
 
 -- * JavaScript instances of AwesomePrelude 'type classes'
 

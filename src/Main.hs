@@ -9,7 +9,7 @@ import AwesomePrelude
 import HaskellPrelude
 import JsPrelude
 
-import Prelude (Int)
+import Prelude (fromInteger)
 import qualified Prelude as P
 
 
@@ -47,7 +47,7 @@ test4 = fM (just true)
 
 
 
-listy :: [Int]
+listy :: [P.Int]
 listy = 3 `cons` (4 `cons` nil)
 
 bool' :: a -> a -> P.Bool -> a
