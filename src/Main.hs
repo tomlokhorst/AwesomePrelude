@@ -15,16 +15,27 @@ import qualified Prelude as P
 
 -- Switch between these two types and run `test` to see the AwesomePrelude in action!
 
-f :: Js JsBool -> Js JsBool
---f :: P.Bool -> P.Bool
-f x = not x && false || true
+fb :: Js JsBool -> Js JsBool
+--fb :: P.Bool -> P.Bool
+fb x = not x && false || true
 
-test = f true
-
-
+test = fb false
 
 
 
+--fEq :: Js JsBool -> Js JsBool
+fEq :: P.Bool -> P.Bool
+fEq x = x == not x
+
+test2 = fEq true
+
+
+
+--fNumEq :: Js JsNumber -> Js JsNumber -> Js JsBool
+fNumEq :: P.Int -> P.Int -> P.Bool
+fNumEq x y = x == y
+
+test3 = fNumEq 3 4
 
 
 
@@ -32,10 +43,8 @@ test = f true
 
 
 
-
-
--- listy :: [Int]
--- listy = 3 `cons` (4 `cons` nil)
+listy :: [Int]
+listy = 3 `cons` (4 `cons` nil)
 
 -- bool' :: a -> a -> P.Bool -> a
 -- bool' x y b = if b then x else y
