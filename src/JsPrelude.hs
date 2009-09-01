@@ -52,10 +52,11 @@ showJs p@(App _ _)       = fu p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
     args _          = []
 
 data JsBool
-data JsMaybe a
-data JsTuple2 a b
-data JsEither a b
 data JsNumber
+data JsMaybe a
+data JsEither a b
+data JsTuple2 a b
+data JsList a
 
 fun :: [P.String] -> P.String -> P.String
 fun ps ret = "(function (" P.++ intercalate ", " ps P.++ "){ return " P.++ ret P.++ "})"
@@ -71,10 +72,11 @@ instance P.Num (Js JsNumber) where
 
 instance P.Eq (Js JsNumber) where
 
+
 -- * JavaScript instances for AwesomePrelude 'data types'
 
 instance Bool (Js JsBool) (Js r) where
-  bool  = TriOp "?" ":"
+  bool  = \f t p -> TriOp "?" ":" p t f
   true  = Prim "true"
   false = Prim "false"
 
@@ -89,19 +91,37 @@ instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
 instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
   either f g e =
     let e'       = unJsC2 e
+<<<<<<< HEAD:src/JsPrelude.hs
         patLeft  = Destruct (fun ["x"] "x.left")  e'
         patRight = Destruct (fun ["x"] "x.right") e'
     in prim3 (fun ["x", "y", "e"] "e.right === undefined ? x : y") (f patLeft) (g patRight) e'
   left l  = JsC2 (prim (fun ["x"] "{left  : x}") l)
   right r = JsC2 (prim (fun ["x"] "{right : x}") r)
+=======
+        patLeft  = Destruct "(function (x) x.left)"  e'
+        patRight = Destruct "(function (x) x.right)" e'
+    in prim3 "(function (x, y, e) e.right === undefined ? x : y)" (f patLeft) (g patRight) e'
+  left l  = JsC2 (prim "(function (x) { return { left : x }})" l)
+  right r = JsC2 (prim "(function (x) { return {right : x }})" r)
+>>>>>>> Moved stuff around:src/JsPrelude.hs
 
 instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
   tuple2 f p =
     let p' = unJsC2 p
-        patFst = Destruct ("(function (p) p.fst)") p'
-        patSnd = Destruct ("(function (p) p.snd)") p'
+        patFst = Destruct "(function (p) p.fst)" p'
+        patSnd = Destruct "(function (p) p.snd)" p'
     in prim "(function (z, p) z)" (f patFst patSnd)
   ctuple2 x y = JsC2 (prim2 "(function (x, y) { return { fst : x, snd : y }})" x y)
+
+instance List (JsC1 JsList) (Js a) (Js r) where
+  -- list :: r -> (a -> r -> r) -> f a -> r
+  list x f ys =
+    let ys'     = unJsC1 ys
+        patCons = Destruct "(function (x) x.cons)" ys'
+    in prim3 "(function (x, y, zs) zs.cons === undefined ? x : y" x (f patCons undefined) ys'
+  nil = JsC1 (Prim "{ }")
+  -- cons :: a -> f a -> f a
+  cons x xs = JsC2 (prim2 "(function (x, xs) { return { head : x, tail : xs }" x xs)
 
 -- * JavaScript instances of AwesomePrelude 'type classes'
 

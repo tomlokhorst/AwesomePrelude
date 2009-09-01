@@ -39,25 +39,26 @@ test3 = fNumEq 3 4
 
 
 
+fM :: JsC1 JsMaybe (Js JsBool) -> Js JsBool
+--fM :: P.Maybe P.Bool -> P.Bool
+fM = maybe false not
 
+test4 = fM (just true)
 
 
 
 listy :: [Int]
 listy = 3 `cons` (4 `cons` nil)
 
--- bool' :: a -> a -> P.Bool -> a
--- bool' x y b = if b then x else y
--- 
--- f :: (forall a. a -> a -> b -> a) -> a -> b -> a
--- f g a b = g a a b
--- 
--- ok = f bool'
--- -- epicfail = f bool
--- 
--- hi = maybe false not
---        (just true :: P.Maybe P.Bool)
---        -- (just true :: JsC1 JsMaybe (Js JsBool))
+bool' :: a -> a -> P.Bool -> a
+bool' x y b = if b then x else y
+
+f :: (forall a. a -> a -> b -> a) -> a -> b -> a
+f g a b = g a a b
+
+ok = f bool'
+-- epicfail = f bool
+
 -- 
 -- yo = either (P.* 5) (P.const 2)
 --        (right false :: P.Either P.Int P.Bool)
