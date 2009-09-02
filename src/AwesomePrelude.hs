@@ -10,6 +10,9 @@
 
 module AwesomePrelude where
 
+import Prelude (fromInteger)
+import qualified Prelude as P
+
 undefined :: a
 undefined = undefined
 
@@ -77,6 +80,12 @@ xs ++ ys = list ys cons xs
 filter :: (List f a (g a), Bool b (g a), List g a r) =>
             (a -> b) -> f a -> g a
 filter p = list nil (\x xs -> bool xs (x `cons` xs) (p x))
+
+foldr :: (List f a r) => (a -> r -> r) -> r -> f a -> r
+foldr f b = list b f
+
+sum :: (P.Num a, List f a a) => f a -> a
+sum = foldr (P.+) 0
 
 -- An equivalent type class for the normal Prelude.Eq type class,
 -- now based on the Bool type class, instead of the Prelude.Bool data type
