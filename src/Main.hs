@@ -53,18 +53,15 @@ listy = 2 `cons` (3 `cons` (4 `cons` nil))
 
 
 
---fL :: JsC1 JsList (Js JsNumber) -> JsC1 JsList (Js JsNumber)
---fL = map (P.+1)
-
---test5 = fL listy
-
-
-
 -- fL :: JsC1 JsList (Js JsNumber) -> Js JsNumber
--- fL = sum P.. map (P.+1)
+fL :: [P.Int] -> P.Int
+fL = sum
 -- 
 -- test5 = fL listy
 
+
+
+-- Weird test case provided by Erik Hesselink:
 
 bool' :: a -> a -> P.Bool -> a
 bool' x y b = if b then x else y
@@ -73,5 +70,5 @@ f :: (forall a. a -> a -> b -> a) -> a -> b -> a
 f g a b = g a a b
 
 ok = f bool'
--- epicfail = f bool
+--epicfail = f bool
 

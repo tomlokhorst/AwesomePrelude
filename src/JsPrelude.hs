@@ -42,8 +42,9 @@ showJs (Case xs f)       = "(function rec(x) { return "
                              P.++ P.foldr (\(x, j) s -> x P.++ " ? " P.++ (P.show j) P.++ " : " P.++ s)
                                           "undefined" xs
                              P.++ " })(" P.++ P.show f P.++ ")"
-showJs (BinOp s   a b)   = "(" P.++ showJs a P.++ s P.++ showJs b P.++ ")"
-showJs (TriOp s t a b c) = "(" P.++ showJs a P.++ s P.++ showJs b P.++ t P.++ showJs c P.++ ")"
+showJs (BinOp s   a b)   = "(" P.++ showJs a P.++ " " P.++ s P.++ " " P.++ showJs b P.++ ")"
+showJs (TriOp s t a b c) = "(" P.++ showJs a P.++ " " P.++ s P.++ " " P.++ showJs b P.++ " "
+                             P.++ t P.++ " "P.++ showJs c P.++ ")"
 showJs p@(App _ _)       = fu p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
   where
     fu :: Js a -> P.String
