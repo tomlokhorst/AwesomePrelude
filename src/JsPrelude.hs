@@ -10,15 +10,17 @@
 module JsPrelude where
 
 import AwesomePrelude
-import Prelude ((.), ($))
 import qualified Prelude as P
 import Data.List
 import Data.AwesomeList
+import Control.Function
 
 -- * JavaScript DSL
 
 newtype Js1 f a   = Js1 { unJs1 :: Js (f (Js a)) }
 newtype Js2 f a b = Js2 { unJs2 :: Js (f (Js a) (Js b)) }
+
+type a :-> b = Js2 (->) a b
 
 data Js a where
   Prim     :: P.String -> Js a
@@ -27,6 +29,11 @@ data Js a where
   BinOp    :: P.String -> Js a -> Js b -> Js c
   TriOp    :: P.String -> P.String -> Js a -> Js b -> Js c -> Js d
   Fix      :: (Js a -> Js a) -> Js a
+
+-- instance Fun (Js2 (->)) where
+--   id = Js2 $ Prim "function (x) { return x; }"
+--   f $ x = undefined
+--   (.) = undefined
 
 prim :: P.String -> Js a -> Js b
 prim f a = Prim f `App` a
@@ -97,14 +104,15 @@ instance P.Eq (Js JsNumber) where
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 
+-- (Fix (Js1 JsList' (Js JsNumber) -> Js JsNumber))
 instance Fix (Js1 f (Js a) -> Js a) where
-  --fix :: ((Js1 f a -> Js a) -> (Js1 f a -> js a))
-  --        -> (Js1 f a -> Js a)
+  ---fix :: ((Js1 f a -> Js a) -> (Js1 f a -> js a))
+  ---        -> (Js1 f a -> Js a)
   fix f = let x = fix (undefined . f . undefined) :: Js a
           in \x -> Prim (P.show (unJs1 x))
 
 -- unJs1 :: Js1 f a -> Js (f (Js a))
-
+-- 
 -- fix :: (Js a -> Js a) -> Js a
 -- fix :: (Js1 f a -> Js1 f a) -> Js1 f a
 -- App :: Js (Js a -> Js b) -> Js a -> Js b
