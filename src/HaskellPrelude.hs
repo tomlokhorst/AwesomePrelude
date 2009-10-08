@@ -8,13 +8,31 @@ module HaskellPrelude where
 
 import AwesomePrelude
 import qualified Prelude as P
+import Data.AwesomeList
 
 -- * Haskell instances for AwesomePrelude 'data types'
+
+instance Fix a where
+  fix f = f (fix f)
+
+instance BoolC P.Bool where 
+  trueC       = P.True
+  falseC      = P.False
+
+instance BoolD P.Bool r where 
+  boolD f t x = if x then t else f
 
 instance Bool P.Bool r where 
   bool f t x = if x then t else f
   true       = P.True
   false      = P.False
+
+instance MaybeC P.Maybe a where
+  nothingC = P.Nothing
+  justC    = P.Just
+
+instance MaybeD P.Maybe a r where
+  maybeD   = P.maybe
 
 instance Maybe P.Maybe a r where
   maybe   = P.maybe
@@ -41,10 +59,13 @@ instance Tuple2 (,) a b r where
 --   eq                  = P.EQ
 --   gt                  = P.GT
 
-instance List [] a r where
-  list = \x f ys -> P.foldr f x ys
+instance ListC [] a where
   nil  = []
   cons = (:)
+
+instance ListD [] a r where
+  listD x f []     = x
+  listD x f (y:xs) = f y xs
 
 -- * Haskell instances of AwesomePrelude 'type classes'
 

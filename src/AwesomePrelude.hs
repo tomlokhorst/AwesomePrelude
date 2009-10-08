@@ -6,15 +6,40 @@
   , FunctionalDependencies
   , FlexibleInstances
   , ScopedTypeVariables
+  , FlexibleContexts
  #-}
 
 module AwesomePrelude where
 
 import Prelude (fromInteger)
 import qualified Prelude as P
+import Data.AwesomeList
 
 undefined :: a
 undefined = undefined
+
+class BoolC b where
+  falseC :: b
+  trueC  :: b
+
+class (BoolC b) => BoolD b r where
+  boolD :: r -> r -> b -> r
+
+ifA :: (BoolD b r) => b -> r -> r -> r
+ifA p t f = boolD f t p
+
+(&&&) :: (BoolD f f) => f -> f -> f
+(&&&) x y = ifA x y x
+
+(|||) :: (BoolD f f) => f -> f -> f
+(|||) x y = ifA x x y
+
+otherwiseA :: (BoolC f) => f
+otherwiseA = trueC
+
+notA :: (BoolC r, BoolD b r) => b -> r
+notA b = ifA b falseC trueC
+
 
 -- A type class for the normal Prelude.Bool data type
 class Bool f r | f -> r where
@@ -36,6 +61,13 @@ otherwise = true
 
 not :: (Bool b b', Bool b' r) => b -> b'
 not b = if' b false true
+
+class MaybeC m a where
+  nothingC :: m a
+  justC    :: a -> m a
+
+class (MaybeC m a) => MaybeD m a r where
+  maybeD :: r -> (a -> r) -> m a -> r
 
 -- A type class for the normal Prelude.Maybe data type
 class Maybe f a r | f -> a, f -> r where
@@ -65,27 +97,6 @@ curry f x y = f (ctuple2 x y)
 
 uncurry :: (Tuple2 f a b r) => (a -> b -> r) -> f a b -> r
 uncurry f t = tuple2 f t
-
-class List f a r | f -> a, f -> r where
-  list :: r -> (a -> r -> r) -> f a -> r
-  nil  :: f a
-  cons :: a -> f a -> f a
-
-map :: (List f a (g b), List g b r) => (a -> b) -> f a -> g b
-map f = list nil (\x ys -> f x `cons` ys)
-
-(++) :: (List f a (g a), List g a r) => f a -> g a -> g a
-xs ++ ys = list ys cons xs
-
-filter :: (List f a (g a), Bool b (g a), List g a r) =>
-            (a -> b) -> f a -> g a
-filter p = list nil (\x xs -> bool xs (x `cons` xs) (p x))
-
-foldr :: (List f a r) => (a -> r -> r) -> r -> f a -> r
-foldr f b = list b f
-
-sum :: (P.Num a, List f a a) => f a -> a
-sum = foldr (P.+) 0
 
 -- An equivalent type class for the normal Prelude.Eq type class,
 -- now based on the Bool type class, instead of the Prelude.Bool data type

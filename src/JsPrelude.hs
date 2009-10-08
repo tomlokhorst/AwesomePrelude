@@ -4,25 +4,29 @@
   , FlexibleInstances
   , MultiParamTypeClasses
   , UndecidableInstances
+  , ScopedTypeVariables
  #-}
 
 module JsPrelude where
 
 import AwesomePrelude
+import Prelude ((.), ($))
 import qualified Prelude as P
 import Data.List
+import Data.AwesomeList
 
 -- * JavaScript DSL
 
-newtype JsC1 f a   = JsC1 { unJsC1 :: Js (f a) }
-newtype JsC2 f a b = JsC2 { unJsC2 :: Js (f a b) }
+newtype Js1 f a   = Js1 { unJs1 :: Js (f (Js a)) }
+newtype Js2 f a b = Js2 { unJs2 :: Js (f (Js a) (Js b)) }
 
 data Js a where
   Prim     :: P.String -> Js a
-  App      :: Js (a -> b) -> Js a -> Js b
+  App      :: Js (Js a -> Js b) -> Js a -> Js b
   Case     :: [(P.String, Js a)] -> Js b -> Js c
   BinOp    :: P.String -> Js a -> Js b -> Js c
   TriOp    :: P.String -> P.String -> Js a -> Js b -> Js c -> Js d
+  Fix      :: (Js a -> Js a) -> Js a
 
 prim :: P.String -> Js a -> Js b
 prim f a = Prim f `App` a
@@ -45,6 +49,7 @@ showJs (Case xs f)       = "(function rec(x) { return "
 showJs (BinOp s   a b)   = "(" P.++ showJs a P.++ " " P.++ s P.++ " " P.++ showJs b P.++ ")"
 showJs (TriOp s t a b c) = "(" P.++ showJs a P.++ " " P.++ s P.++ " " P.++ showJs b P.++ " "
                              P.++ t P.++ " "P.++ showJs c P.++ ")"
+showJs (Fix f)           = "(function fix(f) { return f(fix(f)); })" P.++ showJs (Fix f)
 showJs p@(App _ _)       = fu p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
   where
     fu :: Js a -> P.String
@@ -55,13 +60,13 @@ showJs p@(App _ _)       = fu p P.++ "(" P.++ intercalate "," (args p) P.++ ")"
     args (App f' a) = args f' P.++ [showJs a]
     args _          = []
 
-instance P.Show (f a) => P.Show (JsC1 f a) where
-  show jc = P.show (unJsC1 jc)
+instance P.Show (f a) => P.Show (Js1 f a) where
+  show jc = P.show (unJs1 jc)
 
 instance P.Show a => P.Show (JsMaybe a) where
   show ls = P.show ls
 
-instance P.Show a => P.Show (JsList a) where
+instance P.Show a => P.Show (JsList' a) where
   show ls = P.show ls
 
 data JsBool
@@ -69,7 +74,8 @@ data JsNumber
 data JsMaybe a
 data JsEither a b
 data JsTuple2 a b
-data JsList a
+data JsList' a
+type JsList a = Js1 JsList' a
 
 fun :: [P.String] -> P.String -> P.String
 fun ps ret = "(function (" P.++ intercalate ", " ps P.++ "){ return " P.++ ret P.++ "})"
@@ -91,29 +97,66 @@ instance P.Eq (Js JsNumber) where
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 
+instance Fix (Js1 f (Js a) -> Js a) where
+  --fix :: ((Js1 f a -> Js a) -> (Js1 f a -> js a))
+  --        -> (Js1 f a -> Js a)
+  fix f = let x = fix (undefined . f . undefined) :: Js a
+          in \x -> Prim (P.show (unJs1 x))
+
+-- unJs1 :: Js1 f a -> Js (f (Js a))
+
+-- fix :: (Js a -> Js a) -> Js a
+-- fix :: (Js1 f a -> Js1 f a) -> Js1 f a
+-- App :: Js (Js a -> Js b) -> Js a -> Js b
+
+instance Fix (Js a) where
+  fix = Fix
+
+instance Fix (Js1 f a) where
+  fix f = Js1 $ fix (unJs1 . f . Js1)
+
+instance Fix (Js2 f a b) where
+  fix f = Js2 $ fix (unJs2 . f . Js2)
+
+instance BoolC (Js JsBool) where
+  trueC       = Prim "true"
+  falseC      = Prim "false"
+
+instance BoolD (Js JsBool) (Js r) where
+  boolD f t p = TriOp "?" ":" p t f
+
 instance Bool (Js JsBool) (Js r) where
   bool f t p = TriOp "?" ":" p t f
   true       = Prim "true"
   false      = Prim "false"
 
-instance Maybe (JsC1 JsMaybe) (Js a) (Js r) where
-  maybe x f m = Case [("x.just !== undefined", f (Prim "x.just")), ("true", x)] (unJsC1 m)
-  nothing     = JsC1 (Prim "\"nothing\"")
-  just x      = JsC1 (prim (fun ["x"] "{ just : x }") x)
+instance MaybeC (Js1 JsMaybe) (Js a) where
+  nothingC     = Js1 (Prim "\"nothing\"")
+  justC x      = Js1 (prim (fun ["x"] "{ just : x }") x)
 
-instance Either (JsC2 JsEither) (Js a) (Js b) (Js r) where
-  either f g e = Case [("x.left !== undefined", f (Prim "x.left")), ("true", g (Prim "x.right"))] (unJsC2 e)
-  left l       = JsC2 (prim (fun ["x"] "{left  : x}") l)
-  right r      = JsC2 (prim (fun ["x"] "{right : x}") r)
+instance MaybeD (Js1 JsMaybe) (Js a) (Js r) where
+  maybeD x f m = Case [("x.just !== undefined", f (Prim "x.just")), ("true", x)] (unJs1 m)
 
-instance Tuple2 (JsC2 JsTuple2) (Js a) (Js b) (Js r) where
-  tuple2 f p  = Case [("true", f (Prim "x.fst") (Prim "x.snd"))] (unJsC2 p)
-  ctuple2 x y = JsC2 (prim2 (fun ["x", "y"] "{ fst : x, snd : y }") x y)
+instance Maybe (Js1 JsMaybe) (Js a) (Js r) where
+  maybe x f m = Case [("x.just !== undefined", f (Prim "x.just")), ("true", x)] (unJs1 m)
+  nothing     = Js1 (Prim "\"nothing\"")
+  just x      = Js1 (prim (fun ["x"] "{ just : x }") x)
 
-instance List (JsC1 JsList) (Js a) (Js r) where
-  list x f ys = Case [("x.head === undefined", x), ("true", f (Prim "x.head") (Prim "rec(x.tail)"))] (unJsC1 ys)
-  nil         = JsC1 (Prim "\"nil\"")
-  cons x xs   = JsC1 (prim2 (fun ["x", "xs"] "{ head : x, tail : xs }") x (unJsC1 xs))
+instance Either (Js2 JsEither) (Js a) (Js b) (Js r) where
+  either f g e = Case [("x.left !== undefined", f (Prim "x.left")), ("true", g (Prim "x.right"))] (unJs2 e)
+  left l       = Js2 (prim (fun ["x"] "{left  : x}") l)
+  right r      = Js2 (prim (fun ["x"] "{right : x}") r)
+
+instance Tuple2 (Js2 JsTuple2) (Js a) (Js b) (Js r) where
+  tuple2 f p  = Case [("true", f (Prim "x.fst") (Prim "x.snd"))] (unJs2 p)
+  ctuple2 x y = Js2 (prim2 (fun ["x", "y"] "{ fst : x, snd : y }") x y)
+
+instance ListC (Js1 JsList') (Js a) where
+  nil         = Js1 (Prim "\"nil\"")
+  cons x xs   = Js1 (prim2 (fun ["x", "xs"] "{ head : x, tail : xs }") x (unJs1 xs))
+
+instance ListD (Js1 JsList') (Js a) (Js r) where
+  listD x f ys = Case [("x.head === undefined", x), ("true", f (Prim "x.head") (Js1 (Prim "x.tail")))] (unJs1 ys)
 
 -- * JavaScript instances of AwesomePrelude 'type classes'
 
