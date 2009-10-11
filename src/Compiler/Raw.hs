@@ -9,7 +9,7 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid
 import Data.Reify
 import Data.Traversable hiding (mapM)
-import qualified Core.Val as Ix
+import qualified Lang.JavaScript as Ix
 import qualified Data.Reify.Graph.CSE as CSE
 import qualified Data.Map as Map
 import qualified Data.IntSet as Set
@@ -17,27 +17,22 @@ import qualified Data.IntSet as Set
 -- Raw value datatype.
 
 data Val f =
-    App f [f]
-  | Arr f f
-  | Comb [f]
-  | Comp f f
-  | Prim Ix.Type String String
+    App f f
+  | Prim String
   deriving (Eq, Ord, Show)
 
 newtype Fix f = In { out :: f (Fix f) }
 
-instance Show (f (Fix f)) => Show (Fix f) where
-  show (In f) = "(" ++ show f ++ ")"
+-- instance Show (f (Fix f)) => Show (Fix f) where
+--   show (In f) = "(" ++ show f ++ ")"
 
 -- Conversion from type indexed values to raw values.
 
-raw :: Ix.Val i -> Fix Val
-raw a@(Ix.App _ _)    = In $ App (fun a) (args a)
-raw   (Ix.Arr a b)    = In $ Arr (raw a) (raw b)
-raw   (Ix.Comb fs)    = In $ Comb (map raw fs)
-raw   (Ix.Comp a b)   = In $ Comp (raw a) (raw b)
-raw   (Ix.Prim t d s) = In $ Prim t d s
+raw :: Ix.Js i -> Fix Val
+raw a@(Ix.App _ _) = In $ App (fun a) (args a)
+raw   (Ix.Prim s)  = In $ Prim t d s
 
+{-
 -- Helpers to uncurry function application.
 
 fun :: Ix.Val i -> Fix Val
@@ -113,4 +108,4 @@ foldVal f0 f1 f2 f3 f4 (Graph xs r) = evalState (folder (r, r `from` m)) Set.emp
 
 mboolM :: (Monad m, Monoid a) => m a -> Bool -> m a
 mboolM a b = if b then a else return mempty
-
+-}

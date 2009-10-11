@@ -1,91 +1,25 @@
-{-# LANGUAGE
-    GADTs
-  , KindSignatures
-  , EmptyDataDecls
-  , FlexibleInstances
-  , FlexibleContexts
-  , MultiParamTypeClasses
-  , FunctionalDependencies
-  , TypeOperators
- #-}
-module Core.Val where
+module Compiler.Val where
 
-import Control.Monad.Identity
-import Control.Monad.State
+type Parameter = String
+data Primitive = 
+    Fun [Parameter] String
+  | Con String
 
--- Core types.
+data Val l a where
+  Prim :: Primitive -> Val l a
+  App  :: Val lang (a -> b) -> Val l a -> Val l b
+  Lam  :: (Val l a -> Val l b) -> Val l (a -> b)
+  Var  :: Val l v
 
-data List a
-data Number
-data Boolean
-data Text
+con :: String -> Val l a
+con = Prim . Con
 
-data Type = Fun | Con | In | Out | InOut | Cast
-  deriving (Eq, Ord, Show)
+fun1 :: [Parameter] -> String -> Val l a -> Val l b
+fun1 p b c = Prim (Fun p b) `App` c
 
--- Indexed FRP values.
+fun2 :: [Parameter] -> String -> Val l a -> Val l b -> Val l c
+fun2 p b c d = Prim (Fun p b) `App` c `App` d
 
-data Val :: * -> * where
-  App   :: Val (a -> b) -> Val a -> Val b
-  Prim  :: Type -> String -> String -> Val a
-
-infixr 1 :->
-infixr 2 :~>
-type a :-> b = Val a -> b
-type a :~> b = Val a -> Val b
-
-prim :: Type -> String -> String -> a :~> b
-prim t q f a = Prim t q f `App` a
-
-prim2 :: Type -> String -> String -> a :-> b :~> c
-prim2 t q f a b = Prim t q f `App` a `App` b
-
-prim3 :: Type -> String -> String -> a :-> b :-> c :~> d
-prim3 t q f a b c = Prim t q f `App` a `App` b `App` c
-
-instance Eq (Val a) where
-  (==) = undefined
-
-instance Show (Val a) where
-  show = undefined
-
--- Category instance for easy composing.
-
--- The FRP monad is a state monad that saves dependency graphs.
-
-type FRP a = StateT [Val ()] Identity a
-
-infixl 1 <~
-
-(<~) :: a :-> a :-> FRP ()
-(<~) a b = modify (Arr a b:)
-
-(<~>) :: a :-> a :-> FRP ()
-(<~>) a b = (a <~ b) >> (b <~ a)
-
--- Primitive conversions.
-
-class ToText a where
-  text :: Val a -> Val Text
-
-instance ToText Text where
-  text = prim Cast "cast" "/*cast*/"
-
--- Lift constant values into nodes.
-
-class Show a => Const a b | a -> b where
-  con :: a -> Val b
-
-instance Const [Char] Text where
-  con s = Prim Con (show s) (show s)
-
-instance Const Int Number where
-  con i = Prim Con (show i) (show i)
-
-instance Const Float Number where
-  con i = Prim Con (show i) (show i)
-
-instance Const Bool Boolean where
-  con False = Prim Con "T" "false"
-  con True  = Prim Con "F" "true"
+fun3 :: [Parameter] -> String -> Val l a -> Val l b -> Val l c -> Val l d
+fun3 p b c d e = Prim (Fun p b) `App` c `App` d `App` e
 
