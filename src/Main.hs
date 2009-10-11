@@ -7,7 +7,7 @@ module Main where
 
 import AwesomePrelude
 --import HaskellPrelude
-import JsPrelude
+import Lang.JavaScript
 import Generic.Data.List
 
 import Prelude (fromInteger)

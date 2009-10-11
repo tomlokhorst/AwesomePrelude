@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs #-}
-module JsPrelude where
+module Lang.JavaScript where
 
 import qualified Prelude as P
 import Generic.Data.Tuple

@@ -4,7 +4,7 @@
   , UndecidableInstances
  #-}
 
-module HaskellPrelude where
+module Lang.Haskell where
 
 import AwesomePrelude
 import qualified Prelude as P

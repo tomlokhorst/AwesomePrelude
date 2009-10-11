@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, EmptyDataDecls, FlexibleInstances, MultiParamTypeClasses
            , UndecidableInstances #-}
 
-module CsPrelude where
+module Lang.Cs where
 
 import AwesomePrelude
 import qualified Prelude as P
