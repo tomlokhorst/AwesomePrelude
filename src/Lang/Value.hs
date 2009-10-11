@@ -1,9 +1,12 @@
-module Compiler.Val where
+module Lang.Value where
 
 type Parameter = String
 data Primitive = 
     Fun [Parameter] String
   | Con String
+
+-- Values have an index for the language and an index for the type of value
+-- being represented.
 
 data Val l a where
   Prim :: Primitive -> Val l a

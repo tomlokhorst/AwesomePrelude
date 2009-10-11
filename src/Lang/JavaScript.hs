@@ -1,6 +1,6 @@
 module Lang.JavaScript where
 
-import Compiler.Val
+import Lang.Value
 import Generic.Control.Function
 import Generic.Data.Bool
 import Generic.Data.Either
@@ -23,7 +23,7 @@ instance FunC (Val JavaScript) where
 instance BoolC (Val JavaScript) where
   true  = con "true"
   false = con "false"
-  bool = fun3 ["t", "e", "b"] "b ? t : e"
+  bool  = fun3 ["t", "e", "b"] "b ? t : e"
 
 instance NumC (Val JavaScript) where
   (+) = fun2 ["a", "b"] "a + b"
