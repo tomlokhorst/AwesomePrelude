@@ -13,20 +13,28 @@ module Data.AwesomeList where
 
 import Prelude (fromInteger)
 import qualified Prelude as P
+import Control.Function
 
-class Fix a where
-  fix :: (a -> a) -> a
+class ListC f l a where
+  nil  :: f (l a)
+  cons :: f a -> f (l a) -> f (l a)
 
-class ListC l a where
-  nil  :: l a
-  cons :: a -> l a -> l a
-
-class (ListC l a) => ListD l a r where
-  listD :: r -> (a -> l a -> r) -> l a -> r
+class ListC f l a => ListD f l a r where
+  listD :: f r -> (f a -> f (l a) -> f r) -> f (l a) -> f r
 
 foldr
-  :: (ListD l a r, Fix (l a -> r)) => (a -> r -> r) -> r -> l a -> r
-foldr f b = fix (\r -> listD b (\y ys -> f y (r ys)))
+  :: (Fun f, ListD f l a b)
+  => (f a -> f b -> f b) -> f b -> f (l a) -> f b
+foldr f b xs = fix (\r -> lam (listD b (\y ys -> f y (r $ ys)))) $ xs
+
+sum :: (P.Num (f a), Fun f, ListD f l a a) => f (l a) -> f a
+sum = foldr (P.+) 0
+
+
+
+
+
+
 
 --map :: (List f a (g b), List g b r) => (a -> b) -> f a -> g b
 --map f = list nil (\x ys -> f x `cons` ys)
@@ -37,9 +45,6 @@ foldr f b = fix (\r -> listD b (\y ys -> f y (r ys)))
 --filter :: (List f a (g a), Bool b (g a), List g a r) =>
 --            (a -> b) -> f a -> g a
 --filter p = list nil (\x xs -> bool xs (x `cons` xs) (p x))
-
-sum :: (P.Num a, ListD l a a, Fix (l a -> a)) => l a -> a
-sum = foldr (P.+) 0
 
 --foldrB f b = fix (\r -> foldrA f b r)
 

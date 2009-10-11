@@ -22,7 +22,7 @@ class BoolC b where
   falseC :: b
   trueC  :: b
 
-class (BoolC b) => BoolD b r where
+class BoolC b => BoolD b r where
   boolD :: r -> r -> b -> r
 
 ifA :: (BoolD b r) => b -> r -> r -> r
