@@ -12,10 +12,10 @@ class ListC f where
 singleton :: ListC f => f a -> f [a]
 singleton a = cons a nil
 
-foldr :: (Fun f, ListC f) => (f a -> f b -> f b) -> f b -> f [a] -> f b
-foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r $ ys)))) $ xs
+foldr :: (FunC f, ListC f) => (f a -> f b -> f b) -> f b -> f [a] -> f b
+foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
 
-sum :: (Fun f, NumC f, ListC f) => f [Num] -> f Num
+sum :: (FunC f, NumC f, ListC f) => f [Num] -> f Num
 sum = foldr (+) 0
 
 (++) :: ListC f => f [a] -> f [a] -> f [a]

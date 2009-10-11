@@ -13,6 +13,6 @@ class MaybeC f where
 fromMaybe :: MaybeC f => f a -> f (Maybe a) -> f a
 fromMaybe d m = maybe d (\a -> a) m
 
-catMaybes :: (Fun f, ListC f, MaybeC f) => f [Maybe a] -> f [a]
+catMaybes :: (FunC f, ListC f, MaybeC f) => f [Maybe a] -> f [a]
 catMaybes = foldr (\a b -> maybe nil singleton a ++ b) nil
 
