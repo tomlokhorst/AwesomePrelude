@@ -74,13 +74,13 @@ instance ListC Js where
 
 instance Eq Js Bool where
   (==) = fun2 ["a", "b"] "a == b"
-  (/=) = fun2 ["a", "b"] "a == b"
+  (/=) = fun2 ["a", "b"] "a /= b"
 
 instance (Eq Js a, Eq Js b) => Eq Js (a, b) where
   (==) = fun2 ["a", "b"] "a == b"
-  (/=) = fun2 ["a", "b"] "a == b"
+  (/=) = fun2 ["a", "b"] "a /= b"
 
 instance Eq Js a => Eq Js [a] where
   (==) = fun2 ["a", "b"] "a == b"
-  (/=) = fun2 ["a", "b"] "a == b"
+  (/=) = fun2 ["a", "b"] "a /= b"
 

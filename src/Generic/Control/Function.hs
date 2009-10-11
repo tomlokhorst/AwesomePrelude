@@ -10,16 +10,17 @@ class FunC f where
   app :: f (a -> b) -> f a -> f b
   fix :: (f a -> f a) -> f a
 
--- Could as well use default definitions of ($) and (.).
+id :: FunC f => f a -> f a
+id a = lam (\i -> i) `app` a
 
 infixr 9 .
 infixr 0 $
 
-($) :: (a -> b) -> a -> b
-($) f a = f a
+($) :: FunC f => (f a -> f b) -> f a -> f b
+($) f a = lam f `app` a
 
-(.) :: (b -> c) -> (a -> b) -> (a -> c)
-(.) f g a = f (g a)
+(.) :: (FunC f) => (f b -> f c) -> (f a -> f b) -> f a -> f c
+(.) f g a = lam f `app` (lam g `app` a)
 
 lam2 :: FunC f => (f a -> f b -> f c) -> f (a -> b -> c)
 lam2 f = lam (\a -> lam (f a))
