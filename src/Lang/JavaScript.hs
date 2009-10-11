@@ -32,12 +32,12 @@ fun2 p b = app2 (Prim (Fun p b))
 fun3 :: [Parameter] -> P.String -> Js a -> Js b -> Js c -> Js d
 fun3 p b = app3 (Prim (Fun p b))
 
+-- * JavaScript instances for AwesomePrelude 'data types'
+
 instance FunC Js where
   lam = Lam
   app = App
   fix f = Prim (Fun ["f"] "fix") `app` lam f
-
--- * JavaScript instances for AwesomePrelude 'data types'
 
 instance BoolC Js where
   true  = con "true"
@@ -68,7 +68,7 @@ instance EitherC Js where
 instance ListC Js where
   nil      = con "{ nil : 1 }"
   cons     = fun2 ["x", "xs"] "{ head : x, tail : xs }"
-  list b f = (fun3 ["a", "f", "xs"] "xs.nil ? b f(x.head, x.tail)") b (lam2 f)
+  list b f = (fun3 ["a", "f", "xs"] "xs.nil ? b : f(x.head, x.tail)") b (lam2 f)
 
 -- * JavaScript instances of AwesomePrelude 'type classes'
 

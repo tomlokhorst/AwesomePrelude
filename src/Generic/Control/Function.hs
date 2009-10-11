@@ -1,17 +1,25 @@
 module Generic.Control.Function where
 
-import qualified Prelude as P
+import qualified Prelude
 
-infixr 9 .
--- infixr 0 $
+undefined :: a
+undefined = Prelude.undefined
 
 class FunC f where
   lam :: (f a -> f b) -> f (a -> b)
   app :: f (a -> b) -> f a -> f b
   fix :: (f a -> f a) -> f a
 
-(.) :: FunC f => f (b -> c) -> f (a -> b) -> f (a -> c)
-l . r = lam (\a -> (l `app` (r `app` a)))
+-- Could as well use default definitions of ($) and (.).
+
+infixr 9 .
+infixr 0 $
+
+($) :: (a -> b) -> a -> b
+($) f a = f a
+
+(.) :: (b -> c) -> (a -> b) -> (a -> c)
+(.) f g a = f (g a)
 
 lam2 :: FunC f => (f a -> f b -> f c) -> f (a -> b -> c)
 lam2 f = lam (\a -> lam (f a))
