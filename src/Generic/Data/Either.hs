@@ -1,9 +1,10 @@
 module Generic.Data.Either where
 
-import qualified Prelude as P
+import Prelude ()
 
-class Either f where
-  left   :: f a -> f (P.Either a b)
-  right  :: f b -> f (P.Either a b)
-  either :: (f a -> f r) -> (f b -> f r) -> f (P.Either a b) -> f r
+data Either a b
+class EitherC f where
+  left   :: f a -> f (Either a b)
+  right  :: f b -> f (Either a b)
+  either :: (f a -> f r) -> (f b -> f r) -> f (Either a b) -> f r
 

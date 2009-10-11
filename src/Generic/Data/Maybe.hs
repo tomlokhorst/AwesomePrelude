@@ -1,17 +1,18 @@
 module Generic.Data.Maybe where
 
+import Prelude ()
 import Generic.Data.List
 import Generic.Control.Function
-import qualified Prelude as P
 
-class Maybe f where
-  nothing :: f (P.Maybe a)
-  just    :: f a -> f (P.Maybe a)
-  maybe   :: f r -> (f a -> f r) -> f (P.Maybe a) -> f r
+data Maybe a
+class MaybeC f where
+  nothing :: f (Maybe a)
+  just    :: f a -> f (Maybe a)
+  maybe   :: f r -> (f a -> f r) -> f (Maybe a) -> f r
 
-fromMaybe :: Maybe f => f a -> f (P.Maybe a) -> f a
+fromMaybe :: MaybeC f => f a -> f (Maybe a) -> f a
 fromMaybe d m = maybe d (\a -> a) m
 
-catMaybes :: (List f, Maybe f, Fun f) => f [P.Maybe a] -> f [a]
+catMaybes :: (Fun f, ListC f, MaybeC f) => f [Maybe a] -> f [a]
 catMaybes = foldr (\a b -> maybe nil singleton a ++ b) nil
 

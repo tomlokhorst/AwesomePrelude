@@ -1,22 +1,23 @@
 module Generic.Data.Bool where
 
-import qualified Prelude as P
+import Prelude ()
 
-class Bool f where
-  true  :: f P.Bool
-  false :: f P.Bool
-  bool  :: f a -> f a -> f P.Bool -> f a
+data Bool
+class BoolC f where
+  true  :: f Bool
+  false :: f Bool
+  bool  :: f a -> f a -> f Bool -> f a
 
-not :: Bool f => f P.Bool -> f P.Bool
+not :: BoolC f => f Bool -> f Bool
 not = bool false true
 
-and :: Bool f => f P.Bool -> f P.Bool -> f P.Bool
+and :: BoolC f => f Bool -> f Bool -> f Bool
 and a b = bool b false a
 
-or :: Bool f => f P.Bool -> f P.Bool -> f P.Bool
+or :: BoolC f => f Bool -> f Bool -> f Bool
 or a b = bool true b a
 
 class Eq f a where
-  (==) :: f a -> f a -> f P.Bool
-  (/=) :: f a -> f a -> f P.Bool
+  (==) :: f a -> f a -> f Bool
+  (/=) :: f a -> f a -> f Bool
 
