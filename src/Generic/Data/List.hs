@@ -9,11 +9,11 @@
   , FlexibleContexts
  #-}
 
-module Data.AwesomeList where
+module Generic.Data.List where
 
 import Prelude (fromInteger)
 import qualified Prelude as P
-import Control.Function
+import Generic.Control.Function
 
 class List f where
   nil  :: f [a]

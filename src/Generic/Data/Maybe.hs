@@ -1,7 +1,7 @@
-module Data.AMaybe where
+module Generic.Data.Maybe where
 
-import Data.AwesomeList
-import Control.Function
+import Generic.Data.List
+import Generic.Control.Function
 import qualified Prelude as P
 
 class Maybe f where

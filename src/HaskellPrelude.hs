@@ -8,7 +8,7 @@ module HaskellPrelude where
 
 import AwesomePrelude
 import qualified Prelude as P
-import Data.AwesomeList
+import Generic.Data.List
 
 -- * Haskell instances for AwesomePrelude 'data types'
 

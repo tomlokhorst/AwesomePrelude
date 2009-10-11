@@ -1,4 +1,4 @@
-module Control.Function where
+module Generic.Control.Function where
 
 import qualified Prelude as P
 

@@ -1,4 +1,4 @@
-module Data.AEither where
+module Generic.Data.Either where
 
 import qualified Prelude as P
 

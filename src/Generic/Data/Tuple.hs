@@ -1,4 +1,4 @@
-module Data.Tuple where
+module Generic.Data.Tuple where
 
 class Tuple f where
   mkTuple :: f a -> f b -> f (a, b) 

@@ -13,7 +13,7 @@ module AwesomePrelude where
 
 import Prelude (fromInteger)
 import qualified Prelude as P
-import Data.AwesomeList
+import Generic.Data.List
 
 undefined :: a
 undefined = undefined

@@ -2,12 +2,12 @@
 module JsPrelude where
 
 import qualified Prelude as P
-import Data.Tuple
-import Data.ABool
-import Data.AMaybe
-import Data.AEither
-import Data.AwesomeList
-import Control.Function
+import Generic.Data.Tuple
+import Generic.Data.Bool
+import Generic.Data.Maybe
+import Generic.Data.Either
+import Generic.Data.List
+import Generic.Control.Function
 
 type Parameter = P.String
 data Primitive = 

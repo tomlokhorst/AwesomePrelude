@@ -1,4 +1,4 @@
-module Data.ABool where
+module Generic.Data.Bool where
 
 import qualified Prelude as P
 

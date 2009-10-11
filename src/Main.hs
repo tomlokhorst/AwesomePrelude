@@ -8,7 +8,7 @@ module Main where
 import AwesomePrelude
 --import HaskellPrelude
 import JsPrelude
-import Data.AwesomeList
+import Generic.Data.List
 
 import Prelude (fromInteger)
 import qualified Prelude as P
