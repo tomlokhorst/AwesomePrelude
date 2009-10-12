@@ -20,10 +20,9 @@ cc :: [a] -> [a] -> [a]
 cc = (Prelude.++)
 
 showJsPrim :: Primitive JavaScript -> Prelude.String
-showJsPrim (Fun []     body) = "function () { return " `cc` body `cc` "}"
+showJsPrim (Fun []     body) = body
 showJsPrim (Fun (x:xs) body) = "function (" `cc` x `cc` ") { return " `cc` b `cc` "}"
   where b = if Prelude.null xs then body else showJsPrim (Fun xs body)
-showJsPrim (Con c) = c
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 
@@ -42,14 +41,14 @@ instance NumC (Val JavaScript) where
   (-) = fun2 ["a", "b"] "a - b"
   (*) = fun2 ["a", "b"] "a * b"
   (/) = fun2 ["a", "b"] "a / b"
-  num x = Prim (Con (Prelude.show x))
+  num x = con (Prelude.show x)
 
 instance TupleC (Val JavaScript) where
   mkTuple = fun2 ["a", "b"] "{ fst : a, snd : b}"
   tuple f = (fun2 ["f", "t"] "f(t.fst, t.snd)") (lam2 f)
 
 instance MaybeC (Val JavaScript) where
-  nothing   = Prim (Con "{ nothing : 1 }")
+  nothing   = con "{ nothing : 1 }"
   just      = fun1 ["x"] "{ just : x }"
   maybe n j = (fun3 ["n", "j", "m"] "m.nothing ? n : j(x.just)") n (lam j)
 
