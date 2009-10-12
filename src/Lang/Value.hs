@@ -4,15 +4,16 @@ type Parameter = String
 data Primitive = 
     Fun [Parameter] String
   | Con String
+  deriving Show
 
 -- Values have an index for the language and an index for the type of value
 -- being represented.
 
 data Val l a where
   Prim :: Primitive -> Val l a
-  App  :: Val lang (a -> b) -> Val l a -> Val l b
+  App  :: Val l (a -> b) -> Val l a -> Val l b
   Lam  :: (Val l a -> Val l b) -> Val l (a -> b)
-  Var  :: Val l v
+  Var  :: Integer -> Val l a
 
 con :: String -> Val l a
 con = Prim . Con
