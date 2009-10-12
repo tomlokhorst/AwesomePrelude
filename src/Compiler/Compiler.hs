@@ -1,4 +1,4 @@
-module Core.Compiler where
+module Compiler.Compiler where
 
 import Control.Applicative
 import Compiler.Raw
@@ -6,7 +6,7 @@ import Data.List (intercalate)
 import Data.Reify
 import qualified Lang.Value as Ix
 
-compiler :: Ix.Val l i -> IO [Char]
+compiler :: Ix.Val l i -> IO String
 compiler vs = intercalate "\n" . workerJs <$> fromValues vs
 
 workerJs :: Graph Val -> [String]
