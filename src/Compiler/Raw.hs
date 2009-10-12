@@ -23,15 +23,16 @@ data Val f =
 
 newtype Fix f = In { out :: f (Fix f) }
 
-instance Show (f (Fix f)) => Show (Fix f) where
-  show (In f) = "(" ++ show f ++ ")"
+-- instance Show (f (Fix f)) => Show (Fix f) where
+--   show (In f) = "(" ++ show f ++ ")"
 
 -- Conversion from type indexed values to raw values.
 
-raw :: Ix.Val l i -> Fix Val
+raw :: Show (Ix.Primitive l) => Ix.Val l i -> Fix Val
 raw v = evalState (tr v) 0
   where
-  tr :: (Applicative m, MonadState Integer m) => Ix.Val l i -> m (Fix Val)
+  tr :: (Show (Ix.Primitive l), Applicative m, MonadState Integer m)
+     => Ix.Val l i -> m (Fix Val)
   tr (Ix.App f a) = (\g b -> In (App g b)) <$> tr f <*> tr a
   tr (Ix.Prim s)  = pure (In (Prim (show s)))
   tr (Ix.Lam f)   = modify (+1) >> get >>= \r -> tr (f (Ix.Var r))
@@ -39,7 +40,7 @@ raw v = evalState (tr v) 0
 
 -- Dealing with multiple values.
 
-fromValues :: Ix.Val l i -> IO (Graph Val)
+fromValues :: Show (Ix.Primitive l) => Ix.Val l i -> IO (Graph Val)
 fromValues = fmap CSE.cse . reifyGraph . raw
 
 -- Useful instances.

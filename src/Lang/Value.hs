@@ -1,16 +1,16 @@
 module Lang.Value where
 
 type Parameter = String
-data Primitive = 
-    Fun [Parameter] String
+type Body = String
+data Primitive l = 
+    Fun [Parameter] Body
   | Con String
-  deriving Show
 
 -- Values have an index for the language and an index for the type of value
 -- being represented.
 
 data Val l a where
-  Prim :: Primitive -> Val l a
+  Prim :: Primitive l -> Val l a
   App  :: Val l (a -> b) -> Val l a -> Val l b
   Lam  :: (Val l a -> Val l b) -> Val l (a -> b)
   Var  :: Integer -> Val l a

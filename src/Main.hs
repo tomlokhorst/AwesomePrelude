@@ -1,10 +1,10 @@
 module Main where
 
+import Compiler.Compiler
+import Generic.Control.Function
 import Generic.Data.List
 import Generic.Data.Number
-import Generic.Control.Function
 import Lang.JavaScript
-import Compiler.Compiler
 import qualified Prelude as P
 
 mylist :: (NumC f, ListC f) => f [Num]

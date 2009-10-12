@@ -6,7 +6,7 @@ import Data.List (intercalate)
 import Data.Reify
 import qualified Lang.Value as Ix
 
-compiler :: Ix.Val l i -> IO String
+compiler :: Show (Ix.Primitive l) => Ix.Val l i -> IO [Char]
 compiler vs = intercalate "\n" . workerJs <$> fromValues vs
 
 workerJs :: Graph Val -> [String]

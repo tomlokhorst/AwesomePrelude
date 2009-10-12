@@ -13,6 +13,18 @@ import qualified Prelude
 data JavaScript
 type Js a = Val JavaScript a
 
+instance Prelude.Show (Primitive JavaScript) where
+  show = showJsPrim
+
+cc :: [a] -> [a] -> [a]
+cc = (Prelude.++)
+
+showJsPrim :: Primitive JavaScript -> Prelude.String
+showJsPrim (Fun []     body) = "function () { return " `cc` body `cc` "}"
+showJsPrim (Fun (x:xs) body) = "function (" `cc` x `cc` ") { return " `cc` b `cc` "}"
+  where b = if Prelude.null xs then body else showJsPrim (Fun xs body)
+showJsPrim (Con c) = c
+
 -- * JavaScript instances for AwesomePrelude 'data types'
 
 instance FunC (Val JavaScript) where
