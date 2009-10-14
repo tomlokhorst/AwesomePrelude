@@ -19,6 +19,7 @@ import qualified Data.IntSet as Set
 data Val f =
     App f f
   | Prim String
+  | Abs String f
   deriving (Eq, Ord, Show)
 
 newtype Fix f = In { out :: f (Fix f) }
@@ -29,14 +30,14 @@ newtype Fix f = In { out :: f (Fix f) }
 -- Conversion from type indexed values to raw values.
 
 raw :: Show (Ix.Primitive l) => Ix.Val l i -> Fix Val
-raw v = evalState (tr v) 0
+raw = flip evalState 0 . tr
   where
   tr :: (Show (Ix.Primitive l), Applicative m, MonadState Integer m)
      => Ix.Val l i -> m (Fix Val)
   tr (Ix.App f a) = (\g b -> In (App g b)) <$> tr f <*> tr a
   tr (Ix.Prim s)  = pure (In (Prim (show s)))
-  tr (Ix.Lam f)   = modify (+1) >> get >>= \r -> tr (f (Ix.Var r))
-  tr (Ix.Var x)   = pure (In (Prim (show x)))
+  tr (Ix.Lam f)   = modify (+1) >> get >>= \r -> In . Abs ('p':show r) <$> tr (f (Ix.Var r))
+  tr (Ix.Var x)   = pure (In (Prim ('p':show x)))
 
 -- Dealing with multiple values.
 
@@ -48,14 +49,17 @@ fromValues = fmap CSE.cse . reifyGraph . raw
 instance Functor Val where
   fmap f (App g a) = App (f g) (f a)
   fmap _ (Prim s)  = Prim s
+  fmap f (Abs p b) = Abs p (f b)
 
 instance Foldable Val where
   fold (App f a) = f `mappend` a
   fold (Prim _)  = mempty
+  fold (Abs _ b) = b
 
 instance Traversable Val where
   traverse f (App g a) = App <$> f g <*> f a
   traverse _ (Prim s)  = pure (Prim s)
+  traverse f (Abs p b) = Abs p <$> f b
 
 instance Traversable a => MuRef (Fix a) where
   type DeRef (Fix a) = a
@@ -71,9 +75,10 @@ from f = fromMaybe (error "internal error in foldVal") . Map.lookup f
 foldVal
   :: (Nodes -> Int -> Int -> Int -> a)
   -> (Nodes -> Int -> String -> a)
+  -> (Nodes -> Int -> String -> Int -> a)
   -> Graph Val
   -> [a]
-foldVal f0 f1 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
+foldVal f0 f1 f2 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
   where
     m = Map.fromList xs
     folder (i, term) =
@@ -82,6 +87,7 @@ foldVal f0 f1 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
       in case term of
         App f a -> (\x y z -> x ++ y ++ z) <$> rec f <*> rec a <*> pure [f0 m i f a]
         Prim s  ->                                                 pure [f1 m i s]
+        Abs v b -> (++)                    <$>           rec b <*> pure [f2 m i v b]
 
 mboolM :: (Monad m, Monoid a) => m a -> Bool -> m a
 mboolM a b = if b then a else return mempty

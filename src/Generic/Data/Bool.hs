@@ -3,21 +3,21 @@ module Generic.Data.Bool where
 import Prelude ()
 
 data Bool
-class BoolC f where
-  true  :: f Bool
-  false :: f Bool
-  bool  :: f a -> f a -> f Bool -> f a
+class BoolC j where
+  true  :: j Bool
+  false :: j Bool
+  bool  :: j a -> j a -> j Bool -> j a
 
-not :: BoolC f => f Bool -> f Bool
+not :: BoolC j => j Bool -> j Bool
 not = bool false true
 
-and :: BoolC f => f Bool -> f Bool -> f Bool
+and :: BoolC j => j Bool -> j Bool -> j Bool
 and a b = bool b false a
 
-or :: BoolC f => f Bool -> f Bool -> f Bool
+or :: BoolC j => j Bool -> j Bool -> j Bool
 or a b = bool true b a
 
-class Eq f a where
-  (==) :: f a -> f a -> f Bool
-  (/=) :: f a -> f a -> f Bool
+class Eq j a where
+  (==) :: j a -> j a -> j Bool
+  (/=) :: j a -> j a -> j Bool
 

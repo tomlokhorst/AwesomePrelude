@@ -5,14 +5,14 @@ import Generic.Data.List
 import Generic.Control.Function
 
 data Maybe a
-class MaybeC f where
-  nothing :: f (Maybe a)
-  just    :: f a -> f (Maybe a)
-  maybe   :: f r -> (f a -> f r) -> f (Maybe a) -> f r
+class MaybeC j where
+  nothing :: j (Maybe a)
+  just    :: j a -> j (Maybe a)
+  maybe   :: j r -> (j a -> j r) -> j (Maybe a) -> j r
 
-fromMaybe :: MaybeC f => f a -> f (Maybe a) -> f a
+fromMaybe :: MaybeC j => j a -> j (Maybe a) -> j a
 fromMaybe d m = maybe d (\a -> a) m
 
-catMaybes :: (FunC f, ListC f, MaybeC f) => f [Maybe a] -> f [a]
+catMaybes :: (FunC j, ListC j, MaybeC j) => j [Maybe a] -> j [a]
 catMaybes = foldr (\a b -> maybe nil singleton a ++ b) nil
 

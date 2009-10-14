@@ -7,15 +7,18 @@ import Generic.Data.Number
 import Lang.JavaScript
 import qualified Prelude as P
 
-mylist :: (NumC f, ListC f) => f [Num]
+mylist :: (NumC j, ListC j) => j [Num]
 mylist = 1 `cons` (2 `cons` (3 `cons` (4 `cons` nil)))
 
-sumList :: (NumC f, ListC f, FunC f) => f Num
+sumList :: (NumC j, ListC j, FunC j) => j Num
 sumList = sum mylist
 
-jsList :: Js Num
-jsList = sumList
+jsList :: Js [Num]
+jsList = mylist
+
+jsApp :: Js Num
+jsApp = id 4
 
 test :: P.IO ()
-test = compiler jsList P.>>= P.putStrLn
+test = compiler jsApp P.>>= P.putStrLn
 

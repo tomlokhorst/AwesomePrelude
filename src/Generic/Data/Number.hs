@@ -4,18 +4,18 @@ import Prelude ()
 import qualified Prelude
 
 data Num
-class NumC f where
-  (+) :: f Num -> f Num -> f Num
-  (-) :: f Num -> f Num -> f Num
-  (*) :: f Num -> f Num -> f Num
-  (/) :: f Num -> f Num -> f Num
-  num :: Prelude.Integer -> f Num
+class NumC j where
+  (+) :: j Num -> j Num -> j Num
+  (-) :: j Num -> j Num -> j Num
+  (*) :: j Num -> j Num -> j Num
+  (/) :: j Num -> j Num -> j Num
+  num :: Prelude.Integer -> j Num
 
 -- Terrible hack to get number literals working.
 
-instance Prelude.Show (f Num) where
-instance Prelude.Eq   (f Num) where
-instance NumC f => Prelude.Num (f Num) where
+instance Prelude.Show (j Num) where
+instance Prelude.Eq   (j Num) where
+instance NumC j => Prelude.Num (j Num) where
   (+)    = Prelude.undefined
   (*)    = Prelude.undefined
   abs    = Prelude.undefined

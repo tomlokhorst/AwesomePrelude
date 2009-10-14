@@ -14,15 +14,13 @@ data JavaScript
 type Js a = Val JavaScript a
 
 instance Prelude.Show (Primitive JavaScript) where
-  show = showJsPrim
-
-cc :: [a] -> [a] -> [a]
-cc = (Prelude.++)
-
-showJsPrim :: Primitive JavaScript -> Prelude.String
-showJsPrim (Fun []     body) = body
-showJsPrim (Fun (x:xs) body) = "function (" `cc` x `cc` ") { return " `cc` b `cc` "}"
-  where b = if Prelude.null xs then body else showJsPrim (Fun xs body)
+  show (Fun ys body) =
+    case ys of
+      []   -> body
+      x:xs ->
+        let b = if Prelude.null xs then body else Prelude.show (Fun xs body :: Primitive JavaScript)
+            cc = (Prelude.++)
+        in "function (" `cc` x `cc` ") { return " `cc` b `cc` "}"
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 

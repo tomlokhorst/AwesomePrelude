@@ -13,6 +13,7 @@ workerJs :: Graph Val -> [String]
 workerJs = foldVal
   (\_ i f a -> mkAssign i ++ mkId f ++ "(" ++ mkId a ++ ")")
   (\_ i s   -> mkAssign i ++ s)
+  (\_ i v b -> mkAssign i ++ "function (" ++ v ++ ") { return " ++ mkId b ++ "}")
 
 mkId :: Int -> String
 mkId i = '_':show i

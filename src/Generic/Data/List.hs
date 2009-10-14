@@ -5,26 +5,29 @@ import Generic.Data.Number
 import Generic.Data.Bool
 import Generic.Control.Function
 
-class ListC f where
-  nil  :: f [a]
-  cons :: f a -> f [a] -> f [a]
-  list :: f r -> (f a -> f [a] -> f r) -> f [a] -> f r
+class ListC j where
+  nil  :: j [a]
+  cons :: j a -> j [a] -> j [a]
+  list :: j r -> (j a -> j [a] -> j r) -> j [a] -> j r
 
-singleton :: ListC f => f a -> f [a]
+singleton :: ListC j => j a -> j [a]
 singleton a = cons a nil
 
-(++) :: ListC f => f [a] -> f [a] -> f [a]
+(++) :: ListC j => j [a] -> j [a] -> j [a]
 xs ++ ys = list ys cons xs
 
-foldr :: (FunC f, ListC f) => (f a -> f b -> f b) -> f b -> f [a] -> f b
+foldr :: (FunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
 
-sum :: (FunC f, NumC f, ListC f) => f [Num] -> f Num
+length :: (FunC j, NumC j, ListC j) => j [a] -> j Num
+length = foldr (\_ -> (+1)) 0
+
+sum :: (FunC j, NumC j, ListC j) => j [Num] -> j Num
 sum = foldr (+) 0
 
-map :: (ListC f, FunC f) => (f a -> f b) -> f [a] -> f [b]
+map :: (ListC j, FunC j) => (j a -> j b) -> j [a] -> j [b]
 map f = foldr (\a r -> f a `cons` r) nil
 
-filter :: (ListC f, BoolC f, FunC f) => (f a -> f Bool) -> f [a] -> f [a]
+filter :: (ListC j, BoolC j, FunC j) => (j a -> j Bool) -> j [a] -> j [a]
 filter p = foldr (\x xs -> bool xs (x `cons` xs) (p x)) nil
 

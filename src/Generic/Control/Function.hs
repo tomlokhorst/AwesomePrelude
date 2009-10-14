@@ -5,32 +5,35 @@ import qualified Prelude
 undefined :: a
 undefined = Prelude.undefined
 
-class FunC f where
-  lam :: (f a -> f b) -> f (a -> b)
-  app :: f (a -> b) -> f a -> f b
-  fix :: (f a -> f a) -> f a
+class FunC j where
+  lam :: (j a -> j b) -> j (a -> b)
+  app :: j (a -> b) -> j a -> j b
+  fix :: (j a -> j a) -> j a
 
-id :: FunC f => f a -> f a
+id :: FunC j => j a -> j a
 id a = lam (\i -> i) `app` a
+
+const :: FunC j => j a -> j b -> j a
+const a b = lam2 (\c _ -> c) `app` a `app` b
 
 infixr 9 .
 infixr 0 $
 
-($) :: FunC f => (f a -> f b) -> f a -> f b
+($) :: FunC j => (j a -> j b) -> j a -> j b
 ($) f a = lam f `app` a
 
-(.) :: (FunC f) => (f b -> f c) -> (f a -> f b) -> f a -> f c
+(.) :: (FunC j) => (j b -> j c) -> (j a -> j b) -> j a -> j c
 (.) f g a = lam f `app` (lam g `app` a)
 
-lam2 :: FunC f => (f a -> f b -> f c) -> f (a -> b -> c)
+lam2 :: FunC j => (j a -> j b -> j c) -> j (a -> b -> c)
 lam2 f = lam (\a -> lam (f a))
 
-lam3 :: FunC f => (f a -> f b -> f c -> f d) -> f (a -> b -> c -> d)
+lam3 :: FunC j => (j a -> j b -> j c -> j d) -> j (a -> b -> c -> d)
 lam3 f = lam (\a -> lam2 (f a))
 
-app2 :: FunC f => f (a -> b -> c) -> f a -> f b -> f c
+app2 :: FunC j => j (a -> b -> c) -> j a -> j b -> j c
 app2 f x y = (f `app` x) `app` y
 
-app3 :: FunC f => f (a -> b -> c -> d) -> f a -> f b -> f c -> f d
+app3 :: FunC j => j (a -> b -> c -> d) -> j a -> j b -> j c -> j d
 app3 f x y z = app2 f x y `app` z
 
