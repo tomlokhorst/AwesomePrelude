@@ -10,3 +10,6 @@ class Applicative j m => Monad j m where
 return :: Monad j m => j a -> j (m a)
 return = pure
 
+join :: Monad j m => j (m (m a)) -> j (m a)
+join ma = ma >>= \x -> x
+
