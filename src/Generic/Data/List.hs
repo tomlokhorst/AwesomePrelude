@@ -4,11 +4,15 @@ import Prelude ()
 import Generic.Data.Number
 import Generic.Data.Bool
 import Generic.Control.Function
+import Generic.Control.Functor
 
 class ListC j where
   nil  :: j [a]
   cons :: j a -> j [a] -> j [a]
   list :: j r -> (j a -> j [a] -> j r) -> j [a] -> j r
+
+instance (FunC j, ListC j) => Functor j [] where
+  fmap = map
 
 singleton :: ListC j => j a -> j [a]
 singleton a = cons a nil
