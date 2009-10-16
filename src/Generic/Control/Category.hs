@@ -4,9 +4,7 @@ import Prelude ()
 
 infixr 9 .
 
-class Category j cat where
-  id  :: cat (j a) (j a)
-  (.) :: cat (j b) (j c)
-      -> cat (j a) (j b)
-      -> cat (j a) (j c)
+class Category j (~>) where
+  id  :: (j a ~> j a)
+  (.) :: (j b ~> j c) -> (j a ~> j b) -> (j a ~> j c)
 
