@@ -1,6 +1,7 @@
 module Generic.Control.Function where
 
 import qualified Prelude
+import Generic.Control.Category
 
 undefined :: a
 undefined = Prelude.undefined
@@ -10,20 +11,19 @@ class FunC j where
   app :: j (a -> b) -> j a -> j b
   fix :: (j a -> j a) -> j a
 
-id :: FunC j => j a -> j a
-id a = lam (\i -> i) `app` a
+instance FunC j => Category j (->) where
+  id a = lam (\i -> i) `app` a
+  (.) f g a = lam f `app` (lam g `app` a)
 
-const :: FunC j => j a -> j b -> j a
-const a b = lam2 (\c _ -> c) `app` a `app` b
-
-infixr 9 .
 infixr 0 $
 
 ($) :: FunC j => (j a -> j b) -> j a -> j b
 ($) f a = lam f `app` a
 
-(.) :: (FunC j) => (j b -> j c) -> (j a -> j b) -> j a -> j c
-(.) f g a = lam f `app` (lam g `app` a)
+const :: FunC j => j a -> j b -> j a
+const a b = lam2 (\c _ -> c) `app` a `app` b
+
+-- Helper functions.
 
 lam2 :: FunC j => (j a -> j b -> j c) -> j (a -> b -> c)
 lam2 f = lam (\a -> lam (f a))

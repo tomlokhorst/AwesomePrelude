@@ -1,5 +1,4 @@
 {-# LANGUAGE UndecidableInstances #-}
-
 module Generic.Control.MonadPlus where
 
 import Prelude ()

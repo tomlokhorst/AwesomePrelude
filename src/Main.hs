@@ -1,9 +1,7 @@
 module Main where
 
 import Compiler.Compiler
-import Generic.Control.Function
-import Generic.Data.List
-import Generic.Data.Number
+import Generic.Prelude
 import Lang.JavaScript
 import qualified Prelude as P
 
