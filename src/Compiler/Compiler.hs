@@ -11,10 +11,11 @@ compiler vs = intercalate "\n" . workerJs <$> fromValues vs
 
 workerJs :: Graph Val -> [String]
 workerJs = foldVal
-  (\_ i f a -> mkAssign i ++ mkId f ++ "(" ++ mkId a ++ ")")
-  (\_ i s   -> mkAssign i ++ s)
-  (\_ i v b -> mkAssign i ++ "function (" ++ v ++ ") { return " ++ mkId b ++ "}")
-  (\_ _ v   -> v)
+  (\_ r0 r1 i f a -> concat r0 ++ "\n" ++ concat r1 ++ "\n"
+                  ++ mkAssign i ++ mkId f ++ "(" ++ mkId a ++ ")")
+  (\_       i s   -> mkAssign i ++ s)
+  (\_ r0    i v b -> mkAssign i ++ "function (" ++ v ++ ") {\n" ++ concat r0 ++ "\n return " ++ mkId b ++ "}")
+  (\_       i v   -> mkAssign i ++  v)
 
 mkId :: Int -> String
 mkId i = '_':show i

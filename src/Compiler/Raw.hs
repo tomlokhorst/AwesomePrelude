@@ -17,13 +17,16 @@ import qualified Data.IntSet as Set
 -- Raw value datatype.
 
 data Val f =
-    App f f
+    f :@: f
   | Prim String
-  | Abs String f
+  | Lam String f
   | Var String
   deriving (Eq, Ord, Show)
 
 newtype Fix f = In { out :: f (Fix f) }
+
+instance Show (f (Fix f)) => Show (Fix f) where
+  show (In f) = "(" ++ show f ++ ")"
 
 -- Conversion from type indexed values to raw values.
 
@@ -32,9 +35,9 @@ raw = flip evalState 0 . tr
   where
   tr :: (Show (Ix.Primitive l), Applicative m, MonadState Integer m)
      => Ix.Val l i -> m (Fix Val)
-  tr (Ix.App f a) = (\g b -> In (App g b)) <$> tr f <*> tr a
+  tr (Ix.App f a) = (\g b -> In (g :@: b)) <$> tr f <*> tr a
   tr (Ix.Prim s)  = pure (In (Prim (show s)))
-  tr (Ix.Lam f)   = modify (+1) >> get >>= \r -> In . Abs ('v':show r) <$> tr (f (Ix.Var r))
+  tr (Ix.Lam f)   = modify (+1) >> get >>= \r -> In . Lam ('v':show r) <$> tr (f (Ix.Var r))
   tr (Ix.Var x)   = pure (In (Var ('v':show x)))
 
 -- Dealing with multiple values.
@@ -45,21 +48,21 @@ fromValues = fmap CSE.cse . reifyGraph . raw
 -- Useful instances.
 
 instance Functor Val where
-  fmap f (App g a) = App (f g) (f a)
+  fmap f (g :@: a) = f g :@: f a
   fmap _ (Prim s)  = Prim s
-  fmap f (Abs v b) = Abs v (f b)
+  fmap f (Lam v b) = Lam v (f b)
   fmap _ (Var v)   = Var v
 
 instance Foldable Val where
-  fold (App f a) = f `mappend` a
+  fold (f :@: a) = f `mappend` a
   fold (Prim _)  = mempty
-  fold (Abs _ b) = b
+  fold (Lam _ b) = b
   fold (Var _)   = mempty
 
 instance Traversable Val where
-  traverse f (App g a) = App <$> f g <*> f a
+  traverse f (g :@: a) = (:@:) <$> f g <*> f a
   traverse _ (Prim s)  = pure (Prim s)
-  traverse f (Abs v b) = Abs v <$> f b
+  traverse f (Lam v b) = Lam v <$> f b
   traverse _ (Var v)   = pure (Var v)
 
 instance Traversable a => MuRef (Fix a) where
@@ -74,9 +77,9 @@ from :: Ord k => k -> Map.Map k a -> a
 from f = fromMaybe (error "internal error in foldVal") . Map.lookup f
 
 foldVal
-  :: (Nodes -> Int -> Int -> Int -> a)
+  :: (Nodes -> [a] -> [a] -> Int -> Int -> Int -> a)
   -> (Nodes -> Int -> String -> a)
-  -> (Nodes -> Int -> String -> Int -> a)
+  -> (Nodes -> [a] -> Int -> String -> Int -> a)
   -> (Nodes -> Int -> String -> a)
   -> Graph Val
   -> [a]
@@ -85,10 +88,10 @@ foldVal f0 f1 f2 f3 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
     m = Map.fromList xs
     folder (i, term) =
       case term of
-        App f a -> (\x y z -> x ++ y ++ z) <$> rec f <*> rec a <*> pure [f0 m i f a]
-        Prim s  ->                                                 pure [f1 m i s]
-        Abs v b -> (++)                    <$>           rec b <*> pure [f2 m i v b]
-        Var v   ->                                                 pure [f3 m i v]
+        f :@: a -> rec f >>= \r0 -> rec a >>= \r1 -> pure [f0 m r0 r1 i f a]
+        Prim s  ->                                   pure [f1 m i s]
+        Lam v b ->                  rec b >>= \r0 -> pure [f2 m r0 i v b]
+        Var v   ->                                   pure [f3 m i v]
         where rec k =
                 do v <- gets (Set.member k)
                    modify (Set.insert k)
