@@ -1,4 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 module Compiler.Raw where
 
 import Control.Applicative
@@ -13,6 +14,11 @@ import qualified Lang.Value as Ix
 import qualified Data.Reify.Graph.CSE as CSE
 import qualified Data.Map as Map
 import qualified Data.IntSet as Set
+
+-- chris's mods
+
+instance Applicative (State t) where pure = return; (<*>) = ap
+instance Applicative (Reader t) where pure = return; (<*>) = ap
 
 -- Raw value datatype.
 

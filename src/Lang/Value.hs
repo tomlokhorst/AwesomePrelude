@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs #-}
 module Lang.Value where
 
 type Name = String

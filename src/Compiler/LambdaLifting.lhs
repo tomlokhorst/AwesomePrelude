@@ -1,6 +1,6 @@
 First, we will start of with the module header and some imports.
 
-> module Compiler.LambdaLifting where
+> module Compiler.LambdaLifting (lambdaLift) where
 
 > import Compiler.Raw
 > import qualified Data.Set as S
@@ -14,8 +14,8 @@ Lambda-lifting is done by doing three steps, as defined in
 
 Lambda-lifting gives us a list of definitions. The |Fix Val| datatype doesn't contain any |Abs| terms.
 
-> lambdaLift :: Fix Val -> [(Name, [Name], Fix Val)] 
-> lambdaLift = undefined -- collectSCs . abstract . freeVars
+> lambdaLift :: Fix Val -> [(String, Fix Val)]
+> lambdaLift = collectSCs . abstract . freeVars
 
 The |freeVars| function will annotate every expression with its variables. The type of such an annotated expression is:
 
@@ -23,6 +23,12 @@ The |freeVars| function will annotate every expression with its variables. The t
 > type FreeVarExpr  = AnnExpr FreeVars
 > type FreeVars     = S.Set Name
 > type Name         = String
+
+These are some smart constructor/destructor functions:
+
+> ae a b = AnnExpr (a,b)
+> fv = fst . unAnn
+> e = snd . unAnn
 
 |freeVars| operates on simple fixpoints of |Val|:
 
@@ -41,17 +47,12 @@ The |freeVars| function will annotate every expression with its variables. The t
 > freeVars' (Var v)        =  ae (S.singleton v) (Var v)
 > freeVars' (Name nm expr) =  mapVal (Name nm) (freeVars expr)
 
-> ae a b = AnnExpr (a,b)
-> fv = fst . unAnn
-> e = snd . unAnn
 
 > mapVal :: (AnnExpr t -> Val (AnnExpr t)) -> AnnExpr t -> AnnExpr t
 > mapVal f (AnnExpr (a, e)) = ae a (f (AnnExpr (a, e)))
 
-TODO: this can probably be easier.
-
 The function |abstract| changes every lambda expression |e| by adding
-abstractions for all free variables in |e| (and applying them)
+abstractions for all free variables in |e| (and an |App| as well).
 
 > abstract :: AnnExpr (S.Set String) -> Fix Val
 > abstract = f
@@ -62,18 +63,20 @@ abstractions for all free variables in |e| (and applying them)
 >                                    in  addVars (In $ Lam (freeVars ++ x) (abstract expr)) freeVars
 >   f (AnnExpr (a, (Var v)))       = var v
 >   f (AnnExpr (a, (Name x expr))) = name x (abstract expr)
->
 
 > addVars :: Fix Val -> [String] -> Fix Val
-> addVars expr = foldl addVar expr
-> addVar expr = app expr . var
+> addVars = foldl (\e -> app e . var)
+
+The state could be changed into a |Reader| for the |freshVariables| and a |Writer| for the bindings.
 
 > data CollectState = CollectState 
 >   { freshVariable :: Int
 >   , bindings :: [(String, Fix Val)]
 > }
 
-> collectSCs e = let (e', st) = runState (collectSCs' e) (CollectState 0 [])
+collectSCs lifts all the lambdas to supercombinators (as described in the paper).
+
+> collectSCs e = let (e', st) = runState (collectSCs' $ out e) (CollectState 0 [])
 >                in  ("main", e'):(bindings st)
 
 > collectSCs' :: Val (Fix Val) -> State CollectState (Fix Val)
@@ -89,6 +92,8 @@ abstractions for all free variables in |e| (and applying them)
 > collectSCs' (Name nm expr) = do expr' <- collectSCs' (out expr)
 >                                 return $ In $ Name nm expr'
 
+Some helper functions to deal with state
+
 > write :: String -> Fix Val -> State CollectState ()
 > write nm expr = modify (\st -> st {bindings = (nm,expr):(bindings st)})
 
@@ -97,7 +102,7 @@ abstractions for all free variables in |e| (and applying them)
 >                put (st {freshVariable = freshVariable st + 1})
 >                return $ "__super__" ++ (show $ freshVariable st)
 
-This is some testing code:
+And some smart constructors:
 
 > app l r      = In (App l r)
 > prim         = In . Prim
@@ -105,4 +110,6 @@ This is some testing code:
 > var          = In . Var
 > name nm expr = In (Name nm expr)
 
-> example = lam "x" (app (lam "y" (var "x")) (var "x"))
+\begin{spec}
+example = lam "x" (app (lam "y" (var "x")) (var "x"))
+\end{spec}
