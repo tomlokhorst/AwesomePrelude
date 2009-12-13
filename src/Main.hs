@@ -24,6 +24,6 @@ jsApp = maybe 10 (*2) (just (4 * 3))
 test :: P.IO ()
 test = compiler jsApp P.>>= P.putStrLn
 
-test2 :: P.IO ()
-test2 = P.print (raw jsApp)
+-- test2 :: P.IO ()
+-- test2 = P.print (raw jsApp)
 

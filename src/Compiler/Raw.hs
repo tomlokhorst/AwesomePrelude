@@ -11,14 +11,8 @@ import Data.Monoid
 import Data.Reify
 import Data.Traversable hiding (mapM)
 import qualified Lang.Value as Ix
-import qualified Data.Reify.Graph.CSE as CSE
 import qualified Data.Map as Map
 import qualified Data.IntSet as Set
-
--- chris's mods
-
-instance Applicative (State t) where pure = return; (<*>) = ap
-instance Applicative (Reader t) where pure = return; (<*>) = ap
 
 -- Raw value datatype.
 
@@ -28,6 +22,7 @@ data Val f =
   | Lam [String] f
   | Var String
   | Name String f
+  | More [f] -- HACK!!!!!!
   deriving (Eq, Ord, Show)
 
 newtype Fix f = In { out :: f (Fix f) }
@@ -47,11 +42,6 @@ raw = flip runReader 0 . tr
   tr (Ix.Var x)    = pure (In (Var ('v':show x)))
   tr (Ix.Name x v) = (\a -> In (Name x a)) <$> tr v
 
--- Dealing with multiple values.
-
-fromValues :: Show (Ix.Primitive l) => Ix.Val l i -> IO (Graph Val)
-fromValues = fmap CSE.cse . reifyGraph . raw
-
 -- Useful instances.
 
 instance Functor Val where
@@ -60,6 +50,7 @@ instance Functor Val where
   fmap f (Lam v b)  = Lam v (f b)
   fmap _ (Var v)    = Var v
   fmap f (Name n a) = Name n (f a)
+  fmap f (More as)  = More (fmap f as)
 
 instance Foldable Val where
   fold (App f a)  = f `mappend` a
@@ -67,6 +58,7 @@ instance Foldable Val where
   fold (Lam _ b)  = b
   fold (Var _)    = mempty
   fold (Name _ a) = a
+  fold (More as)  = mconcat as
 
 instance Traversable Val where
   traverse f (App g a)  = App <$> f g <*> f a
@@ -74,6 +66,7 @@ instance Traversable Val where
   traverse f (Lam v b)  = Lam v <$> f b
   traverse _ (Var v)    = pure (Var v)
   traverse f (Name n a) = Name n <$> f a
+  traverse f (More as)  = More <$> traverse f as
 
 instance Traversable a => MuRef (Fix a) where
   type DeRef (Fix a) = a
@@ -87,14 +80,15 @@ from :: Ord k => k -> Map.Map k a -> a
 from f = fromMaybe (error "internal error in foldVal") . Map.lookup f
 
 foldVal
-  :: (NodeMap -> [a] -> [a] -> Int -> Int -> Int    -> a)
-  -> (NodeMap               -> Int -> String        -> a)
+  :: (NodeMap -> [a] -> [a] -> Int -> Int -> Int      -> a)
+  -> (NodeMap               -> Int -> String          -> a)
   -> (NodeMap -> [a]        -> Int -> [String] -> Int -> a)
-  -> (NodeMap               -> Int -> String        -> a)
-  -> (NodeMap -> [a]        -> Int -> String -> Int -> a)
+  -> (NodeMap               -> Int -> String          -> a)
+  -> (NodeMap -> [a]        -> Int -> String -> Int   -> a)
+  -> (NodeMap -> [[a]]      -> Int -> [Int]           -> a)
   -> Graph Val
   -> [a]
-foldVal f0 f1 f2 f3 f4 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
+foldVal f0 f1 f2 f3 f4 f5 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
   where
     m = Map.fromList xs
     folder (i, term) =
@@ -104,6 +98,7 @@ foldVal f0 f1 f2 f3 f4 (Graph xs r) = evalState (folder (r, r `from` m)) Set.emp
         Lam v b  ->                  rec b >>= \r0 -> pure [f2 m r0    i v b ]
         Var v    ->                                   pure [f3 m       i v   ]
         Name n b ->                  rec b >>= \r0 -> pure [f4 m r0    i n b ]
+        More as  ->            mapM rec as >>= \rs -> pure [f5 m rs    i as  ]
         where rec k =
                 do v <- gets (Set.member k)
                    modify (Set.insert k)

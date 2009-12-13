@@ -12,8 +12,8 @@ Lambda-lifting is done by doing three steps, as defined in
 
 Lambda-lifting gives us a list of definitions. The |Fix Val| datatype doesn't contain any |Abs| terms.
 
-> lambdaLift :: Fix Val -> [(String, Fix Val)]
-> lambdaLift = collectSCs . abstract . freeVars
+> lambdaLift :: Fix Val -> [Fix Val]
+> lambdaLift = reverse . collectSCs . abstract . freeVars
 
 The |freeVars| function will annotate every expression with its variables. The type of such an annotated expression is:
 
@@ -26,7 +26,6 @@ These are some smart constructor/destructor functions:
 
 > ae a b = AnnExpr (a,b)
 > fv = fst . unAnn
-> e = snd . unAnn
 
 |freeVars| operates on simple fixpoints of |Val|:
 
@@ -69,13 +68,13 @@ The state could be changed into a |Reader| for the |freshVariables| and a |Write
 
 > data CollectState = CollectState 
 >   { freshVariable :: Int
->   , bindings :: [(String, Fix Val)]
-> }
+>   , bindings :: [Fix Val]
+>   }
 
 collectSCs lifts all the lambdas to supercombinators (as described in the paper).
 
 > collectSCs e = let (e', st) = runState (collectSCs' $ out e) (CollectState 0 [])
->                in  ("main", e'):(bindings st)
+>                in  (In (Name "main" e')):(bindings st)
 
 > collectSCs' :: Val (Fix Val) -> State CollectState (Fix Val)
 > collectSCs' (App l r)      = do l' <- collectSCs' (out l)
@@ -93,7 +92,7 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 Some helper functions to deal with state
 
 > write :: String -> Fix Val -> State CollectState ()
-> write nm expr = modify (\st -> st {bindings = (nm,expr):(bindings st)})
+> write nm expr = modify (\st -> st {bindings = (In (Name nm expr)):(bindings st)})
 
 > freshName :: State CollectState String
 > freshName = do st <- get
