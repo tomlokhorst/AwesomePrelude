@@ -20,7 +20,7 @@ instance Prelude.Show (Primitive JavaScript) where
       x:xs ->
         let b = if Prelude.null xs then body else Prelude.show (Fun "" xs body :: Primitive JavaScript)
             cc = (Prelude.++)
-        in "function " `cc` name `cc` " (" `cc` x `cc` ") { return " `cc` b `cc` "}"
+        in "function " `cc` name `cc` " (" `cc` x `cc` ") { return " `cc` b `cc` " }"
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 
@@ -48,7 +48,7 @@ instance TupleC (Val JavaScript) where
 instance MaybeC (Val JavaScript) where
   nothing   = con "{ nothing : 1 }"
   just      = fun1 "just" ["x"] "{ just : x }"
-  maybe n j = (fun3 "maybe" ["n", "j", "m"] "m.nothing ? n : j(x.just)") n (lam j)
+  maybe n j = (fun3 "maybe" ["n", "j", "m"] "m.nothing ? n : j(m.just)") n (lam j)
 
 instance EitherC (Val JavaScript) where
   left       = fun1 "left"  ["l"] "{ left  : x }"
