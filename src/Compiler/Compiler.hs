@@ -15,7 +15,8 @@ workerJs = foldVal
                   ++ mkAssign i ++ mkId f ++ "(" ++ mkId a ++ ")")
   (\_       i s   -> mkAssign i ++ s)
   (\_ r0    i v b -> mkAssign i ++ "function (" ++ v ++ ")\n{\n" ++ indent (concat r0) ++ "  return " ++ mkId b ++ "\n}")
-  (\_       i v   -> mkAssign i ++  v)
+  (\_       i v   -> mkAssign i ++ v)
+  (\_ r0    _ _ _ -> concat r0) -- mkAssign i ++ v)
 
 indent :: String -> String
 indent = unlines . map ("  "++) . lines
