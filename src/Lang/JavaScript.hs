@@ -13,64 +13,64 @@ import qualified Prelude
 data JavaScript
 type Js a = Val JavaScript a
 
-instance Prelude.Show (Primitive JavaScript) where
+{-instance Prelude.Show (Primitive JavaScript) where
   show (Fun name ys body) =
     case ys of
       []   -> body
       x:xs ->
-        let b = if Prelude.null xs then body else Prelude.show (Fun "" xs body :: Primitive JavaScript)
+        let b = if Prelude.null xs then body else Prelude.show (Fun xs body :: Primitive JavaScript)
             cc = (Prelude.++)
-        in "function " `cc` name `cc` " (" `cc` x `cc` ") { return " `cc` b `cc` " }"
+        in "function " `cc` name `cc` " (" `cc` x `cc` ") { return " `cc` b `cc` " }"-}
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 
 instance FunC (Val JavaScript) where
-  lam = Lam
-  app = App
-  fix f = fun1 "fix" ["f", ""] "f(fix(f))" (lam f)
+  lam f   = "lam" `Name` Lam f
+  app f g = "app" `Name` App f g
+  fix f   = "fix" `Name` fun1 ["f", ""] "f(fix(f))" (lam f)
 
 instance BoolC (Val JavaScript) where
-  true  = con "true"
-  false = con "false"
-  bool  = fun3 "bool" ["t", "e", "b"] "b ? t : e"
+  true       = "true"  `Name` con "true"
+  false      = "fales" `Name` con "false"
+  bool t e b = "bool"  `Name` fun3 ["t", "e", "b"] "b ? t : e" t e b
 
 instance NumC (Val JavaScript) where
-  (+) = fun2 "add" ["a", "b"] "a + b"
-  (-) = fun2 "sub" ["a", "b"] "a - b"
-  (*) = fun2 "mul" ["a", "b"] "a * b"
-  (/) = fun2 "div" ["a", "b"] "a / b"
+  a + b = "add" `Name` fun2 ["a", "b"] "a + b" a b
+  a - b = "sub" `Name` fun2 ["a", "b"] "a - b" a b
+  a * b = "mul" `Name` fun2 ["a", "b"] "a * b" a b
+  a / b = "div" `Name` fun2 ["a", "b"] "a / b" a b
   num x = con (Prelude.show x)
 
 instance TupleC (Val JavaScript) where
-  mkTuple = fun2 "mkTuple" ["a", "b"] "{ fst : a, snd : b}"
-  tuple f = (fun2 "tuple" ["f", "t"] "f(t.fst, t.snd)") (lam2 f)
+  mkTuple a b = "mkTuple" `Name` fun2 ["a", "b"] "{ fst : a, snd : b}" a b
+  tuple f t = "tuple" `Name` fun2 ["f", "t"] "f(t.fst, t.snd)" (lam2 f) t
 
 instance MaybeC (Val JavaScript) where
-  nothing   = con "{ nothing : 1 }"
-  just      = fun1 "just" ["x"] "{ just : x }"
-  maybe n j = (fun3 "maybe" ["n", "j", "m"] "m.nothing ? n : j(m.just)") n (lam j)
+  nothing     = "con" `Name` con "{ nothing : 1 }"
+  just x      = "just" `Name` fun1 ["x"] "{ just : x }" x
+  maybe n j m = "maybe" `Name` fun3 ["n", "j", "m"] "m.nothing ? n : j(m.just)" n (lam j) m
 
 instance EitherC (Val JavaScript) where
-  left       = fun1 "left"  ["l"] "{ left  : x }"
-  right      = fun1 "right" ["r"] "{ right : x }"
-  either l r = (fun3 "either" ["l", "r", "e"] "m.left ? l(x.left) : r(x.right)") (lam l) (lam r)
+  left l       = "left"   `Name` fun1 ["l"] "{ left  : x }" l
+  right r      = "right"  `Name` fun1 ["r"] "{ right : x }" r
+  either l r e = "either" `Name` fun3 ["l", "r", "e"] "m.left ? l(x.left) : r(x.right)" (lam l) (lam r) e
 
 instance ListC (Val JavaScript) where
-  nil      = con "{ nil : 1 }"
-  cons     = {- fun2 [] "cons" -} fun2 "cons" ["x", "xs"] "{ head : x, tail : xs }"
-  list b f = {- fun3 [] "list" b (lam2 f) -} (fun3 "list" ["a", "f", "xs"] "xs.nil ? b : f(x.head, x.tail)") b (lam2 f)
+  nil         = "con"  `Name` con "{ nil : 1 }"
+  cons x xs   = "cons" `Name` fun2 ["x", "xs"] "{ head : x, tail : xs }" x xs
+  list b f xs = "list" `Name` fun3 ["a", "f", "xs"] "xs.nil ? b : f(x.head, x.tail)" b (lam2 f) xs
 
 -- * JavaScript instances of AwesomePrelude 'type classes'
 
 instance Eq (Val JavaScript) Bool where
-  (==) = fun2 "eq"  ["a", "b"] "a == b"
-  (/=) = fun2 "neq" ["a", "b"] "a /= b"
+  a == b = "eq"  `Name` fun2 ["a", "b"] "a == b" a b
+  a /= b = "neq" `Name` fun2 ["a", "b"] "a /= b" a b
 
 instance (Eq (Val JavaScript) a, Eq (Val JavaScript) b) => Eq (Val JavaScript) (a, b) where
-  (==) = fun2 "eq"  ["a", "b"] "a == b"
-  (/=) = fun2 "neq" ["a", "b"] "a /= b"
+  a == b = "eq"  `Name` fun2 ["a", "b"] "a == b" a b
+  a /= b = "neq" `Name` fun2 ["a", "b"] "a /= b" a b
 
 instance Eq (Val JavaScript) a => Eq (Val JavaScript) [a] where
-  (==) = fun2 "eq"  ["a", "b"] "a == b"
-  (/=) = fun2 "neq" ["a", "b"] "a /= b"
+  a == b = "eq"  `Name` fun2 ["a", "b"] "a == b" a b
+  a /= b = "neq" `Name` fun2 ["a", "b"] "a /= b" a b
 
