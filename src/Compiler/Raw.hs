@@ -19,7 +19,7 @@ import qualified Data.IntSet as Set
 data Val f =
     App f f
   | Prim String
-  | Lam String f
+  | Lam [String] f
   | Var String
   | Name String f
   deriving (Eq, Ord, Show)
@@ -37,7 +37,7 @@ raw = flip runReader 0 . tr
   tr :: (Show (Ix.Primitive l), Applicative m, MonadReader Integer m) => Ix.Val l i -> m (Fix Val)
   tr (Ix.App f a)  = (\g b -> In (App g b)) <$> tr f <*> tr a
   tr (Ix.Prim s)   = pure (In (Prim (show s)))
-  tr (Ix.Lam f)    = local (+1) (ask >>= \r -> In . Lam ('v':show r) <$> tr (f (Ix.Var r)))
+  tr (Ix.Lam f)    = local (+1) (ask >>= \r -> In . Lam ['v':show r] <$> tr (f (Ix.Var r)))
   tr (Ix.Var x)    = pure (In (Var ('v':show x)))
   tr (Ix.Name x v) = (\a -> In (Name x a)) <$> tr v
 
@@ -83,7 +83,7 @@ from f = fromMaybe (error "internal error in foldVal") . Map.lookup f
 foldVal
   :: (NodeMap -> [a] -> [a] -> Int -> Int -> Int    -> a)
   -> (NodeMap               -> Int -> String        -> a)
-  -> (NodeMap -> [a]        -> Int -> String -> Int -> a)
+  -> (NodeMap -> [a]        -> Int -> [String] -> Int -> a)
   -> (NodeMap               -> Int -> String        -> a)
   -> (NodeMap -> [a]        -> Int -> String -> Int -> a)
   -> Graph Val
