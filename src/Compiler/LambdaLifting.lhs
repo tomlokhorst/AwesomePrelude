@@ -6,8 +6,6 @@ First, we will start of with the module header and some imports.
 > import qualified Data.Set as S
 > import qualified Data.Map as M
 > import Control.Monad.State
-> import Data.Traversable hiding (mapM)
-> import Control.Monad.Writer
 
 Lambda-lifting is done by doing three steps, as defined in 
 <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.30.1125">A modular fully-lazy lambda lifter in Haskell</a>
