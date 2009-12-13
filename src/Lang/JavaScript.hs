@@ -13,14 +13,14 @@ import qualified Prelude
 data JavaScript
 type Js a = Val JavaScript a
 
-{-instance Prelude.Show (Primitive JavaScript) where
-  show (Fun name ys body) =
+instance Prelude.Show (Primitive JavaScript) where
+  show (Fun ys body) =
     case ys of
       []   -> body
       x:xs ->
         let b = if Prelude.null xs then body else Prelude.show (Fun xs body :: Primitive JavaScript)
             cc = (Prelude.++)
-        in "function " `cc` name `cc` " (" `cc` x `cc` ") { return " `cc` b `cc` " }"-}
+        in "function " `cc` " (" `cc` x `cc` ") { return " `cc` b `cc` " }"
 
 -- * JavaScript instances for AwesomePrelude 'data types'
 
