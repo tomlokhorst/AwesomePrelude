@@ -4,7 +4,6 @@ First, we will start of with the module header and some imports.
 
 > import Compiler.Raw
 > import qualified Data.Set as S
-> import qualified Data.Map as M
 > import Control.Monad.State
 
 Lambda-lifting is done by doing three steps, as defined in 
@@ -18,13 +17,13 @@ Lambda-lifting gives us a list of definitions. The |Fix Val| datatype doesn't co
 The |freeVars| function will annotate every expression with its variables. The type of such an annotated expression is:
 
 > newtype AnnExpr a = AnnExpr {unAnn :: (a, Val (AnnExpr a))} deriving Show
-> type FreeVarExpr  = AnnExpr FreeVars
-> type FreeVars     = S.Set Name
-> type Name         = String
 
 These are some smart constructor/destructor functions:
 
+> ae :: a -> Val (AnnExpr a) -> AnnExpr a
 > ae a b = AnnExpr (a,b)
+
+> fv :: AnnExpr a -> a
 > fv = fst . unAnn
 
 |freeVars| operates on simple fixpoints of |Val|:
@@ -43,6 +42,7 @@ These are some smart constructor/destructor functions:
 >                             in  ae (S.difference (fv expr') (S.fromList x)) (Lam x expr')
 > freeVars' (Var v)        =  ae (S.singleton v) (Var v)
 > freeVars' (Name nm expr) =  mapVal (Name nm) (freeVars expr)
+> freeVars' (More _)       =  error "no idea"
 
 
 > mapVal :: (AnnExpr t -> Val (AnnExpr t)) -> AnnExpr t -> AnnExpr t
@@ -54,12 +54,13 @@ abstractions for all free variables in |e| (and an |App| as well).
 > abstract :: AnnExpr (S.Set String) -> Fix Val
 > abstract = f
 >  where
->   f (AnnExpr (a, (App l r)))     = app (abstract l) (abstract r)
->   f (AnnExpr (a, (Prim s)))      = prim s
->   f (AnnExpr (a, (Lam x expr)))  = let freeVars = S.toList a
->                                    in  addVars (In $ Lam (freeVars ++ x) (abstract expr)) freeVars
->   f (AnnExpr (a, (Var v)))       = var v
->   f (AnnExpr (a, (Name x expr))) = name x (abstract expr)
+>   f (AnnExpr (_, (App l r)))     = app (abstract l) (abstract r)
+>   f (AnnExpr (_, (Prim s)))      = prim s
+>   f (AnnExpr (a, (Lam x expr)))  = let frees = S.toList a
+>                                    in  addVars (In $ Lam (frees ++ x) (abstract expr)) frees
+>   f (AnnExpr (_, (Var v)))       = var v
+>   f (AnnExpr (_, (Name x expr))) = name x (abstract expr)
+>   f (AnnExpr (_, (More xs)))     = more (map f xs)
 
 > addVars :: Fix Val -> [String] -> Fix Val
 > addVars = foldl (\e -> app e . var)
@@ -73,6 +74,7 @@ The state could be changed into a |Reader| for the |freshVariables| and a |Write
 
 collectSCs lifts all the lambdas to supercombinators (as described in the paper).
 
+> collectSCs :: Fix Val -> [Fix Val]
 > collectSCs e = let (e', st) = runState (collectSCs' $ out e) (CollectState 0 [])
 >                in  (In (Name "main" e')):(bindings st)
 
@@ -91,6 +93,7 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 > collectSCs' (Name nm expr) = do expr' <- collectSCs' (out expr)
 >                                 write nm expr'
 >                                 return (In $ Var nm)
+> collectSCs' (More _)       = error "collectSCs: More not supported yet."
 
 Some helper functions to deal with state
 
@@ -104,11 +107,20 @@ Some helper functions to deal with state
 
 And some smart constructors:
 
-> app l r      = In (App l r)
-> prim         = In . Prim
-> lam l r      = In (Lam [l] r)
-> var          = In . Var
+> app :: Fix Val -> Fix Val -> Fix Val
+> app l r = In (App l r)
+
+> prim :: String -> Fix Val
+> prim = In . Prim
+
+> var :: String -> Fix Val
+> var = In . Var
+
+> name :: String -> Fix Val -> Fix Val
 > name nm expr = In (Name nm expr)
+
+> more :: [Fix Val] -> Fix Val
+> more xs = In (More xs)
 
 \begin{spec}
 example = lam "x" (app (lam "y" (var "x")) (var "x"))

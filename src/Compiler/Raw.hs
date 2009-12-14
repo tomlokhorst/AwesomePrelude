@@ -2,21 +2,18 @@
 {-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 module Compiler.Raw where
 
-import Control.Arrow
 import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Reader
 import Data.Foldable hiding (elem, mapM_, concatMap, concat, foldr)
 import Data.Maybe (fromMaybe, catMaybes)
 import Data.Monoid
-import Data.List (group, sort)
+import Data.List
 import Data.Reify
 import Data.Traversable hiding (mapM)
 import qualified Lang.Value as Ix
 import qualified Data.Map as Map
 import qualified Data.Set as Set
-
-import Debug.Trace
 
 -- Raw value datatype.
  
@@ -91,10 +88,10 @@ renamer (Graph xs r) =
   where
   replacer (from, to, f) m =
     let Just x = Map.lookup f m
-        rep from to x = if x == from then to else x
+        rep i = if i == from then to else i
     in Map.delete from
      $ Map.insert to x
-     $ Map.map (fmap (rep from to))
+     $ Map.map (fmap rep)
      $ m
 
 -- inliner (vm, x) = 
@@ -132,4 +129,18 @@ foldVal f0 f1 f2 f3 f4 f5 (m, r) = evalState (folder (r, r `from` m)) Set.empty
 
 mboolM :: (Monad m, Monoid a) => m a -> Bool -> m a
 mboolM a b = if b then a else return mempty
+
+valmapToDefinitions :: (ValMap, String) -> [String]
+valmapToDefinitions = foldVal
+  (\_ r0 r1 i f a -> concat r0 ++ "\n" ++ concat r1 ++ "\n"
+                  ++ mkAssign i ++ mkId f ++ "(" ++ mkId a ++ ")")
+  (\_       i s   -> mkAssign i ++ s)
+  (\_ r0    i v b -> mkAssign i ++ "function (" ++ intercalate "," (map ('_':) v) ++ ")\n{\n" ++ indent (concat r0) ++ "  return " ++ mkId b ++ "\n}")
+  (\_       i v   -> mkAssign i ++ '_':v)
+  (\_ r0    i n _ -> mkAssign n ++ mkAssign i ++ concat r0)
+  (\_ rs    _ _   -> concatMap unlines rs)
+  where
+  indent = unlines . map ("  "++) . lines
+  mkId i = '_':i
+  mkAssign s = '_':s ++ " = "
 
