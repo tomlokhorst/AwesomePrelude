@@ -1,7 +1,8 @@
 First, we will start of with the module header and some imports.
 
-> module Compiler.LambdaLifting (lambdaLift) where
+> module Compiler.LambdaLifting (liftLambdas) where
 
+> import Control.Arrow hiding (app)
 > import Compiler.Raw
 > import qualified Data.Set as S
 > import Control.Monad.State
@@ -9,31 +10,31 @@ First, we will start of with the module header and some imports.
 Lambda-lifting is done by doing three steps, as defined in 
 <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.30.1125">A modular fully-lazy lambda lifter in Haskell</a>
 
-Lambda-lifting gives us a list of definitions. The |Fix Val| datatype doesn't contain any |Abs| terms.
+Lambda-lifting gives us a list of definitions. The |Expr| datatype doesn't contain any |Abs| terms.
 
-> lambdaLift :: Fix Val -> [Fix Val]
-> lambdaLift = reverse . collectSCs . abstract . freeVars
+> liftLambdas :: Kleisli IO Expr Expr
+> liftLambdas = arr (more . reverse . collectSCs . abstract . freeVars)
 
 The |freeVars| function will annotate every expression with its variables. The type of such an annotated expression is:
 
-> newtype AnnExpr a = AnnExpr {unAnn :: (a, Val (AnnExpr a))} deriving Show
+> newtype AnnExpr a = AnnExpr {unAnn :: (a, ExprF (AnnExpr a))} deriving Show
 
 These are some smart constructor/destructor functions:
 
-> ae :: a -> Val (AnnExpr a) -> AnnExpr a
+> ae :: a -> ExprF (AnnExpr a) -> AnnExpr a
 > ae a b = AnnExpr (a,b)
 
 > fv :: AnnExpr a -> a
 > fv = fst . unAnn
 
-|freeVars| operates on simple fixpoints of |Val|:
+|freeVars| operates on simple fixpoints of |ExprF|:
 
-> freeVars :: Fix Val -> AnnExpr (S.Set String)
+> freeVars :: Expr -> AnnExpr (S.Set String)
 > freeVars = freeVars' . out
 
 |freeVars'| does the heavy lifting:
 
-> freeVars' :: Val (Fix Val) -> AnnExpr (S.Set String)
+> freeVars' :: ExprF (Expr) -> AnnExpr (S.Set String)
 > freeVars' (App l r)      =  let l' = freeVars l
 >                                 r' = freeVars r
 >                             in  ae (S.union (fv l') (fv r')) (App l' r')
@@ -45,13 +46,13 @@ These are some smart constructor/destructor functions:
 > freeVars' (More _)       =  error "no idea"
 
 
-> mapVal :: (AnnExpr t -> Val (AnnExpr t)) -> AnnExpr t -> AnnExpr t
+> mapVal :: (AnnExpr t -> ExprF (AnnExpr t)) -> AnnExpr t -> AnnExpr t
 > mapVal f (AnnExpr (a, e)) = ae a (f (AnnExpr (a, e)))
 
 The function |abstract| changes every lambda expression |e| by adding
 abstractions for all free variables in |e| (and an |App| as well).
 
-> abstract :: AnnExpr (S.Set String) -> Fix Val
+> abstract :: AnnExpr (S.Set String) -> Expr
 > abstract = f
 >  where
 >   f (AnnExpr (_, (App l r)))     = app (abstract l) (abstract r)
@@ -62,23 +63,23 @@ abstractions for all free variables in |e| (and an |App| as well).
 >   f (AnnExpr (_, (Name x expr))) = name x (abstract expr)
 >   f (AnnExpr (_, (More xs)))     = more (map f xs)
 
-> addVars :: Fix Val -> [String] -> Fix Val
+> addVars :: Expr -> [String] -> Expr
 > addVars = foldl (\e -> app e . var)
 
 The state could be changed into a |Reader| for the |freshVariables| and a |Writer| for the bindings.
 
 > data CollectState = CollectState 
 >   { freshVariable :: Int
->   , bindings :: [Fix Val]
+>   , bindings :: [Expr]
 >   }
 
 collectSCs lifts all the lambdas to supercombinators (as described in the paper).
 
-> collectSCs :: Fix Val -> [Fix Val]
+> collectSCs :: Expr -> [Expr]
 > collectSCs e = let (e', st) = runState (collectSCs' $ out e) (CollectState 0 [])
 >                in  (In (Name "main" e')):(bindings st)
 
-> collectSCs' :: Val (Fix Val) -> State CollectState (Fix Val)
+> collectSCs' :: ExprF (Expr) -> State CollectState (Expr)
 > collectSCs' (App l r)      = do l' <- collectSCs' (out l)
 >                                 r' <- collectSCs' (out r)
 >                                 return (app l' r')
@@ -97,30 +98,13 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 
 Some helper functions to deal with state
 
-> write :: String -> Fix Val -> State CollectState ()
+> write :: String -> Expr -> State CollectState ()
 > write nm expr = modify (\st -> st {bindings = (In (Name nm expr)):(bindings st)})
 
 > freshName :: State CollectState String
 > freshName = do st <- get
 >                put (st {freshVariable = freshVariable st + 1})
 >                return $ "__super__" ++ (show $ freshVariable st)
-
-And some smart constructors:
-
-> app :: Fix Val -> Fix Val -> Fix Val
-> app l r = In (App l r)
-
-> prim :: String -> Fix Val
-> prim = In . Prim
-
-> var :: String -> Fix Val
-> var = In . Var
-
-> name :: String -> Fix Val -> Fix Val
-> name nm expr = In (Name nm expr)
-
-> more :: [Fix Val] -> Fix Val
-> more xs = In (More xs)
 
 \begin{spec}
 example = lam "x" (app (lam "y" (var "x")) (var "x"))
