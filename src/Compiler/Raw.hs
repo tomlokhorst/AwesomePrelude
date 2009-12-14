@@ -2,20 +2,24 @@
 {-# LANGUAGE TypeFamilies, FlexibleContexts #-}
 module Compiler.Raw where
 
+import Control.Arrow
 import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Reader
-import Data.Foldable hiding (elem, mapM_, concatMap, concat)
-import Data.Maybe (fromMaybe)
+import Data.Foldable hiding (elem, mapM_, concatMap, concat, foldr)
+import Data.Maybe (fromMaybe, catMaybes)
 import Data.Monoid
+import Data.List (group, sort)
 import Data.Reify
 import Data.Traversable hiding (mapM)
 import qualified Lang.Value as Ix
 import qualified Data.Map as Map
-import qualified Data.IntSet as Set
+import qualified Data.Set as Set
+
+import Debug.Trace
 
 -- Raw value datatype.
-
+ 
 data Val f =
     App f f
   | Prim String
@@ -72,37 +76,59 @@ instance Traversable a => MuRef (Fix a) where
   type DeRef (Fix a) = a
   mapDeRef f = traverse f . out
 
+type ValMap = Map.Map String (Val String)
+
+blaat :: Show (Ix.Primitive l) => Ix.Val l i -> IO ()
+blaat n = (Map.toList . fst . renamer <$> reifyGraph (raw n)) >>= mapM_ print
+
+renamer :: Graph Val -> (ValMap, String)
+renamer (Graph xs r) =
+  let strings = map (\(u, tu) -> (show u, fmap show tu)) xs
+      named   = catMaybes (map getName strings)
+      getName (from, Name to f) = Just (from, to, f)
+      getName _                 = Nothing
+  in (foldr replacer (Map.fromList strings) named, show r)
+  where
+  replacer (from, to, f) m =
+    let Just x = Map.lookup f m
+        rep from to x = if x == from then to else x
+    in Map.delete from
+     $ Map.insert to x
+     $ Map.map (fmap (rep from to))
+     $ m
+
+-- inliner (vm, x) = 
+--   let uses = map snd . filter ((<=1) . fst) . map (length &&& head) . group . sort . concatMap toList . Map.elems $ vm :: [String]
+--       rep from to x = if x == from then to else x
+--       once (f, t) = Map.map (fmap (rep f t))
+--   in undefined -- (foldr once vm uses, x)
+
 -- Generic value traversal.
 
-type NodeMap = Map.Map Int (Val Int)
-
-from :: Ord k => k -> Map.Map k a -> a
-from f = fromMaybe (error "internal error in foldVal") . Map.lookup f
-
 foldVal
-  :: (NodeMap -> [a] -> [a] -> Int -> Int -> Int      -> a)
-  -> (NodeMap               -> Int -> String          -> a)
-  -> (NodeMap -> [a]        -> Int -> [String] -> Int -> a)
-  -> (NodeMap               -> Int -> String          -> a)
-  -> (NodeMap -> [a]        -> Int -> String -> Int   -> a)
-  -> (NodeMap -> [[a]]      -> Int -> [Int]           -> a)
-  -> Graph Val
+  :: (ValMap -> [a] -> [a] -> String -> String -> String -> a)
+  -> (ValMap               -> String -> String           -> a)
+  -> (ValMap -> [a]        -> String -> [String] -> String -> a)
+  -> (ValMap               -> String -> String           -> a)
+  -> (ValMap -> [a]        -> String -> String -> String -> a)
+  -> (ValMap -> [[a]]      -> String -> [String]         -> a)
+  -> (ValMap, String)
   -> [a]
-foldVal f0 f1 f2 f3 f4 f5 (Graph xs r) = evalState (folder (r, r `from` m)) Set.empty
+foldVal f0 f1 f2 f3 f4 f5 (m, r) = evalState (folder (r, r `from` m)) Set.empty
   where
-    m = Map.fromList xs
     folder (i, term) =
       case term of
         App f b  -> rec f >>= \r0 -> rec b >>= \r1 -> pure [f0 m r0 r1 i f b ]
         Prim s   ->                                   pure [f1 m       i s   ]
-        Lam v b  ->                  rec b >>= \r0 -> pure [f2 m r0    i v b ]
+        Lam v b  -> rec b >>= \r0 ->                  pure [f2 m r0    i v b ]
         Var v    ->                                   pure [f3 m       i v   ]
-        Name n b ->                  rec b >>= \r0 -> pure [f4 m r0    i n b ]
         More as  ->            mapM rec as >>= \rs -> pure [f5 m rs    i as  ]
+        Name n b -> rec b >>= \r0 ->                  pure [f4 m r0    i n b ]
         where rec k =
                 do v <- gets (Set.member k)
                    modify (Set.insert k)
                    mboolM (folder (k, k `from` m)) (not v)
+    from f = fromMaybe (error "internal error in foldVal") . Map.lookup f
 
 mboolM :: (Monad m, Monoid a) => m a -> Bool -> m a
 mboolM a b = if b then a else return mempty

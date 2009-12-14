@@ -6,13 +6,16 @@ import Generic.Control.Category
 undefined :: a
 undefined = Prelude.undefined
 
-class FunC j where
+class NameC j where
+  named :: Prelude.String -> j a -> j a
+
+class NameC j => FunC j where
   lam :: (j a -> j b) -> j (a -> b)
   app :: j (a -> b) -> j a -> j b
   fix :: (j a -> j a) -> j a
 
 instance FunC j => Category j (->) where
-  id a = lam (\i -> i) `app` a
+  id a      = "id" `named` (lam (\i -> i) `app` a)
   (.) f g a = lam f `app` (lam g `app` a)
 
 infixr 0 $

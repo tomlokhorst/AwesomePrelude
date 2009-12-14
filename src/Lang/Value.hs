@@ -19,12 +19,12 @@ data Val l a where
 con :: String -> Val l a
 con = Prim . Fun []
 
-fun1 :: [Parameter] -> Body -> Val l a -> Val l b
-fun1 p b c = Prim (Fun p b) `App` c
+fun1 :: String -> [Parameter] -> Body -> Val l a -> Val l b
+fun1 n p b c = (n `Name` Prim (Fun p b)) `App` c
 
-fun2 :: [Parameter] -> Body -> Val l a -> Val l b -> Val l c
-fun2 p b c d = Prim (Fun p b) `App` c `App` d
+fun2 :: String -> [Parameter] -> Body -> Val l a -> Val l b -> Val l c
+fun2 n p b c d = (n `Name` Prim (Fun p b)) `App` c `App` d
 
-fun3 :: [Parameter] -> Body -> Val l a -> Val l b -> Val l c -> Val l d
-fun3 p b c d e = Prim (Fun p b) `App` c `App` d `App` e
+fun3 :: String -> [Parameter] -> Body -> Val l a -> Val l b -> Val l c -> Val l d
+fun3 n p b c d e = (n `Name` Prim (Fun p b)) `App` c `App` d `App` e
 

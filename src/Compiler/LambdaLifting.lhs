@@ -80,14 +80,17 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 > collectSCs' (App l r)      = do l' <- collectSCs' (out l)
 >                                 r' <- collectSCs' (out r)
 >                                 return (app l' r')
-> collectSCs' (Prim s)       = return (prim s)
+> collectSCs' (Prim s)       = do nm <- freshName          -- to indirect
+>                                 write nm (In $ Prim s)
+>                                 return $ In $ Var nm
 > collectSCs' (Lam x expr)   = do expr' <- collectSCs' (out expr)
 >                                 nm <- freshName
 >                                 write nm (In $ Lam x expr')
 >                                 return $ In $ Var nm
 > collectSCs' (Var v)        = return $ In (Var v)
 > collectSCs' (Name nm expr) = do expr' <- collectSCs' (out expr)
->                                 return $ In $ Name nm expr'
+>                                 write nm expr'
+>                                 return (In $ Var nm)
 
 Some helper functions to deal with state
 
