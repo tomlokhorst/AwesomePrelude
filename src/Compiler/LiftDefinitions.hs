@@ -1,9 +1,10 @@
 module Compiler.LiftDefinitions 
-  ( inlineDefinitions
-  , collectDefinitions
-  , liftDefinitions
-  , definitionsPrinter
-  ) where
+( inlineDefinitions
+, collectDefinitions
+, liftDefinitions
+, printDefinitions
+)
+where
 
 import Compiler.Generics
 import Compiler.Raw 
@@ -39,8 +40,8 @@ liftDefinitions = arr (\e -> more (elems (collectDefinitions e) ++ [tr e]))
     tr d@(In (Id (Def _ _))) = d
     tr e                     = inlineDefinitions e
 
-definitionsPrinter :: Arrow (~>) => Expr ~> String
-definitionsPrinter = arr tr
+printDefinitions :: Arrow (~>) => Expr ~> String
+printDefinitions = arr tr
   where
     tr (In (Id (App   f e)))  = tr f ++ "(" ++ tr e ++ ")"
     tr (In (Id (Con   c)))    = c

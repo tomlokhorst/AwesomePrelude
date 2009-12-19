@@ -2,6 +2,7 @@ First, we will start of with the module header and some imports.
 
 > module Compiler.LambdaLifting (liftLambdas) where
 
+> import Compiler.Generics
 > import Control.Arrow hiding (app)
 > import Compiler.Raw
 > import qualified Data.Set as S
@@ -43,7 +44,7 @@ These are some smart constructor/destructor functions:
 > freeVars' (Lam x expr)   =  let expr' = freeVars expr
 >                             in  ae (S.difference (fv expr') (S.fromList x)) (Lam x expr')
 > freeVars' (Var v)        =  ae (S.singleton v) (Var v)
-> freeVars' (Name nm expr) =  mapVal (Name nm) (freeVars expr)
+> freeVars' (Def nm expr)  =  mapVal (Def nm) (freeVars expr)
 > freeVars' (More _)       =  error "no idea"
 
 > mapVal :: (AnnExpr t -> ExprF (AnnExpr t)) -> AnnExpr t -> AnnExpr t
@@ -61,7 +62,7 @@ abstractions for all free variables in |e| (and an |App| as well).
 >   f (AnnExpr (a, (Lam x expr)))  = let frees = S.toList a
 >                                    in  addVars (In $ Lam (frees ++ x) (abstract expr)) frees
 >   f (AnnExpr (_, (Var v)))       = var v
->   f (AnnExpr (_, (Name x expr))) = name x (abstract expr)
+>   f (AnnExpr (_, (Def x expr)))  = def x (abstract expr)
 >   f (AnnExpr (_, (More xs)))     = more (map f xs)
 
 > addVars :: Expr -> [String] -> Expr
@@ -78,7 +79,7 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 
 > collectSCs :: Expr -> [Expr]
 > collectSCs e = let (e', st) = runState (collectSCs' $ out e) (CollectState 0 [])
->                in  (In (Name "main" e')):(bindings st)
+>                in  (In (Def "main" e')):(bindings st)
 
 > collectSCs' :: ExprF (Expr) -> State CollectState (Expr)
 > collectSCs' (App l r)      = do l' <- collectSCs' (out l)
@@ -95,7 +96,7 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 >                                 write nm (In $ Lam x expr')
 >                                 return $ In $ Var nm
 > collectSCs' (Var v)        = return $ In (Var v)
-> collectSCs' (Name nm expr) = do expr' <- collectSCs' (out expr)
+> collectSCs' (Def nm expr)  = do expr' <- collectSCs' (out expr)
 >                                 write nm expr'
 >                                 return (In $ Var nm)
 > collectSCs' (More _)       = error "collectSCs: More not supported yet."
@@ -103,7 +104,7 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 Some helper functions to deal with state
 
 > write :: String -> Expr -> State CollectState ()
-> write nm expr = modify (\st -> st {bindings = (In (Name nm expr)):(bindings st)})
+> write nm expr = modify (\st -> st {bindings = (In (Def nm expr)):(bindings st)})
 
 > freshName :: State CollectState String
 > freshName = do st <- get
