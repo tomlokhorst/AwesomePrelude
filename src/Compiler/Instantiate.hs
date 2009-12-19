@@ -1,18 +1,34 @@
-module Compiler.Instantiate (instantiateLambas) where
+module Compiler.Instantiate (instantiateLambas, anonymousExprPrinter) where
 
+import Compiler.Generics
 import Compiler.Raw 
-import Control.Arrow hiding (app)
 import Control.Applicative
+import Control.Arrow hiding (app)
 import Control.Monad.Reader
+import Data.List (intercalate)
 import qualified Lang.Value as V
 
-instantiateLambas :: Show (V.Primitive l) => Kleisli IO (V.Val l i) Expr
+instantiateLambas :: Arrow (~>) => V.Val l i ~> Expr
 instantiateLambas = arr (flip runReader 0 . tr)
+  where
+    tr :: V.Val l i -> Reader Integer Expr
+    tr (V.App  f a)  = app <$> tr f <*> tr a
+    tr (V.Con  c)    = pure (con c)
+    tr (V.Prim s vs) = pure (prim s vs)
+    tr (V.Lam  f)    = local (+1) (ask >>= \r -> let v = 'v':show r in lam [v] <$> tr (f (V.Var v)))
+    tr (V.Var  v)    = pure (var v)
+    tr (V.Name n e)  = def n <$> tr e
 
-tr :: Show (V.Primitive l) => V.Val l i -> Reader Integer Expr
-tr (V.App f a)  = app <$> tr f <*> tr a
-tr (V.Prim s)   = pure (prim (show s))
-tr (V.Lam f)    = local (+1) (ask >>= \r -> lam ['v':show r] <$> tr (f (V.Var r)))
-tr (V.Var x)    = pure (var ('v':show x))
-tr (V.Name x v) = name x <$> tr v
+anonymousExprPrinter :: Arrow (~>) => Expr ~> String
+anonymousExprPrinter = arr tr
+  where
+    tr (In (Id (App   f e)))  = tr f ++ "(\n" ++ indent (tr e) ++ ")"
+    tr (In (Id (Con   c)))    = c
+    tr (In (Id (Prim  s vs))) = s ++ " /* free: " ++ intercalate ", " vs ++ " */"
+    tr (In (Id (Lam   as e))) = "(function (" ++ intercalate ", " as ++ ")" ++ "\n{\n" ++ indent ("return " ++ tr e ++ ";") ++ "\n})"
+    tr (In (Id (Var   v)))    = v
+    tr (In (Id (Def   n e)))  = "/* " ++ n ++ "*/ " ++ tr e
+    tr (In (Id (More  es)))   = intercalate "\n" (map tr es)
+
+    indent = unlines . map ("  "++) . lines
 

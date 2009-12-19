@@ -17,7 +17,7 @@ Lambda-lifting gives us a list of definitions. The |Expr| datatype doesn't conta
 
 The |freeVars| function will annotate every expression with its variables. The type of such an annotated expression is:
 
-> newtype AnnExpr a = AnnExpr {unAnn :: (a, ExprF (AnnExpr a))} deriving Show
+> newtype AnnExpr a = AnnExpr {unAnn :: (a, ExprF (AnnExpr a))} -- deriving Show
 
 These are some smart constructor/destructor functions:
 
@@ -38,13 +38,13 @@ These are some smart constructor/destructor functions:
 > freeVars' (App l r)      =  let l' = freeVars l
 >                                 r' = freeVars r
 >                             in  ae (S.union (fv l') (fv r')) (App l' r')
-> freeVars' (Prim s)       =  ae S.empty (Prim s)
+> freeVars' (Con c)        =  ae S.empty (Con c)
+> freeVars' (Prim s vs)    =  ae (S.fromList vs) (Prim s vs)
 > freeVars' (Lam x expr)   =  let expr' = freeVars expr
 >                             in  ae (S.difference (fv expr') (S.fromList x)) (Lam x expr')
 > freeVars' (Var v)        =  ae (S.singleton v) (Var v)
 > freeVars' (Name nm expr) =  mapVal (Name nm) (freeVars expr)
 > freeVars' (More _)       =  error "no idea"
-
 
 > mapVal :: (AnnExpr t -> ExprF (AnnExpr t)) -> AnnExpr t -> AnnExpr t
 > mapVal f (AnnExpr (a, e)) = ae a (f (AnnExpr (a, e)))
@@ -56,7 +56,8 @@ abstractions for all free variables in |e| (and an |App| as well).
 > abstract = f
 >  where
 >   f (AnnExpr (_, (App l r)))     = app (abstract l) (abstract r)
->   f (AnnExpr (_, (Prim s)))      = prim s
+>   f (AnnExpr (_, (Con c)))       = con c
+>   f (AnnExpr (_, (Prim s vs)))   = prim s vs -- TODO ???
 >   f (AnnExpr (a, (Lam x expr)))  = let frees = S.toList a
 >                                    in  addVars (In $ Lam (frees ++ x) (abstract expr)) frees
 >   f (AnnExpr (_, (Var v)))       = var v
@@ -83,9 +84,12 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 > collectSCs' (App l r)      = do l' <- collectSCs' (out l)
 >                                 r' <- collectSCs' (out r)
 >                                 return (app l' r')
-> collectSCs' (Prim s)       = do nm <- freshName          -- to indirect
->                                 write nm (In $ Prim s)
->                                 return $ In $ Var nm
+> collectSCs' (Con c)        = do return (con c) -- nm <- freshName          -- to indirect
+>     --                            write nm (In $ Con c)
+>       --                          return $ In $ Var nm
+> collectSCs' (Prim s vs)    = do return (prim s vs) -- nm <- freshName          -- to indirect
+>                           --      write nm (In $ Prim s)
+>                             --  return $ In $ Var nm
 > collectSCs' (Lam x expr)   = do expr' <- collectSCs' (out expr)
 >                                 nm <- freshName
 >                                 write nm (In $ Lam x expr')

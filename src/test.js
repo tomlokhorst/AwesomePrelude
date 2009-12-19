@@ -1,0 +1,5 @@
+add = (function (v5){ return (function (v6){ return v5 + v6; }); })
+cons = (function (v1){ return (function (v2){ return { head : v1, tail : v2 }; }); })
+fix = (function (v1){ return fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); })
+list = (function (v3){ return (function (v4){ return (function (v5){ return v5.nil ? v3 : v4(v5.head)(v5.tail); }); }); })
+fix((function (v1){ return (function (v2){ return list(0)((function (v3){ return (function (v4){ return add(v3)(v1(v4)); }); }))(v2); }); }))(cons(1)(cons(2)(cons(3)(cons(4)(cons(5)(cons(6)(cons(7)({ nil : 1 }))))))))

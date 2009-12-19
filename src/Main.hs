@@ -1,19 +1,12 @@
 module Main where
 
-import Compiler.Compiler
-import Compiler.Raw
+import Compiler.Pipeline
 import Generic.Prelude
 import Lang.JavaScript
 import qualified Prelude as P
 
-mylist :: (NumC j, ListC j, FunC j) => j [Num]
-mylist = 1 `cons` (2 `cons` (3 `cons` (4 `cons` nil)))
-
-sumList :: (NumC j, ListC j, FunC j) => j Num
-sumList = sum mylist
-
 jsList :: Js [Num]
-jsList = mylist
+jsList = 1 `cons` (2 `cons` (3 `cons` (4 `cons` (5 `cons` (6 `cons` (7 `cons` nil))))))
 
 jsSumList :: Js Num
 jsSumList = sum jsList
@@ -21,6 +14,8 @@ jsSumList = sum jsList
 jsApp :: Js Num
 jsApp = maybe 10 (*2) (just (4 * 3))
 
-test :: P.IO ()
-test = compiler jsApp P.>>= P.putStrLn
+main :: P.IO ()
+main =
+  do out <- compiler jsSumList
+     P.writeFile "test.js" out
 

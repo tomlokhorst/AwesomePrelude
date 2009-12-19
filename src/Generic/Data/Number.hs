@@ -13,7 +13,7 @@ class NumC j where
 
 -- Terrible hack to get number literals working.
 
-instance Prelude.Show (j Num) where
+instance Prelude.Show (j Num) where show _ = "num"
 instance Prelude.Eq   (j Num) where
 instance NumC j => Prelude.Num (j Num) where
   (+)    = Prelude.undefined
