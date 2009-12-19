@@ -17,11 +17,11 @@ instance (FunC j, ListC j) => Functor j [] where
 singleton :: ListC j => j a -> j [a]
 singleton a = cons a nil
 
-(++) :: ListC j => j [a] -> j [a] -> j [a]
-xs ++ ys = list ys cons xs
-
 foldr :: (FunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
+
+(++) :: (FunC j, ListC j) => j [a] -> j [a] -> j [a]
+xs ++ ys = foldr cons ys xs
 
 length :: (FunC j, NumC j, ListC j) => j [a] -> j Num
 length = foldr (\_ -> (+1)) 0

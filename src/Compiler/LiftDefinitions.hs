@@ -35,7 +35,7 @@ collectDefinitions = reduce defs
 -- definitions.
 
 liftDefinitions :: Arrow (~>) => Expr ~> Expr
-liftDefinitions = arr (\e -> more (elems (collectDefinitions e) ++ [tr e]))
+liftDefinitions = arr (\e -> more (elems (collectDefinitions e) ++ [def "__main" (tr e)]))
   where
     tr d@(In (Id (Def _ _))) = d
     tr e                     = inlineDefinitions e

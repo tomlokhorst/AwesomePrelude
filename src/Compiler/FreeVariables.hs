@@ -11,8 +11,8 @@ import Compiler.LiftDefinitions
 import Compiler.Raw
 import Control.Arrow hiding (app)
 import Data.List (intercalate)
-import Data.Map (keys)
-import Data.Set hiding (map)
+import Data.Set hiding (map, insert)
+import qualified Data.Map as M
 
 data FreeVarA f a = FreeVarA { free :: Set String , expr :: f a }
 
@@ -25,7 +25,7 @@ annotateWithFreeVariables = arr ow
     where
 
     -- references to global definitions don't count as free variables.
-    globs = fromList (keys (collectDefinitions ex))
+    globs = fromList (M.keys (collectDefinitions ex))
 
     -- traversal function
     ann (App l r)   = ae (union (fv l') (fv r'))           (App  l' r') where l' = rec l; r' = rec r
@@ -42,14 +42,14 @@ annotateWithFreeVariables = arr ow
     fv = free . out
 
 printDefinitionsWithFreeVariables :: Arrow (~>) => ExprFV ~> String
-printDefinitionsWithFreeVariables = arr tr0
+printDefinitionsWithFreeVariables = arr top
   where
-  tr0 (In (FreeVarA vf x)) = (if size vf /= 0 then "/* free: " ++ show (toList vf) ++ " */" else "") ++ tr x
-  tr (App   f e)  = tr0 f ++ "(" ++ tr0 e ++ ")"
+  top (In (FreeVarA vf x)) = (if size vf /= 0 then "/* free: " ++ show (toList vf) ++ " */" else "/* 0 */") ++ tr x
+  tr (App   f e)  = top f ++ "(" ++ top e ++ ")"
   tr (Con   c)    = c
   tr (Prim  s _)  = s
-  tr (Lam   as e) = "(function (" ++ intercalate ", " as ++ ")" ++ "{ " ++ "return " ++ tr0 e ++ ";" ++ " })"
+  tr (Lam   as e) = "(function (" ++ intercalate ", " as ++ ")" ++ "{ " ++ "return " ++ top e ++ ";" ++ " })"
   tr (Var   v)    = v
-  tr (Def   n e)  = n ++ " = " ++ tr0 e
-  tr (More  es)   = intercalate "\n" (map tr0 es)
+  tr (Def   n e)  = n ++ " = " ++ top e
+  tr (More  es)   = intercalate "\n" (map top es)
 
