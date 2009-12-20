@@ -27,7 +27,7 @@ instance FunC (Val JavaScript) where
 instance BoolC (Val JavaScript) where
   true  = Con "true"
   false = Con "false"
-  bool  = fun3 "bool" (\t e b -> b ++ " ? " ++ t ++ " : " ++ e)
+  bool x y z = fun3 "bool" (\t e b -> b ++ " ? " ++ t ++ "(null) : " ++ e ++ "(null)") (lam (const x)) (lam (const y)) z
 
 instance NumC (Val JavaScript) where
   (+) = fun2 "add" (\a b -> a ++ " + " ++ b)
