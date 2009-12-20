@@ -12,6 +12,7 @@ compiler :: Val l i -> IO String
 compiler = runKleisli
     $ Lambdas.instantiate
   >>> Definitions.lift
+  >>> Definitions.eliminiateDoubles
   >>> FreeVariables.annotateDefinitions
   >>> ClosedApplications.lift
   >>> Definitions.dump

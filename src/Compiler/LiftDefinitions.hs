@@ -3,9 +3,8 @@ module Compiler.LiftDefinitions
 , Definition
 , DefinitionsA (..)
 , Definitions
-, inline
-, collect
 , lift
+, eliminiateDoubles
 , dump
 )
 where
@@ -13,7 +12,7 @@ where
 import Compiler.Generics
 import Compiler.Raw 
 import Control.Arrow hiding (app)
-import Data.List (intercalate)
+import Data.List (intercalate, nubBy)
 
 data DefinitionA a = Def 
   { defName :: String
@@ -50,6 +49,9 @@ collect = reduce defs
 
 lift :: Arrow (~>) => Expr ~> Definitions
 lift = arr (\e -> Defs (collect e ++ [Def "__main" (inline e)]))
+
+eliminiateDoubles :: Arrow (~>) => Definitions ~> Definitions
+eliminiateDoubles = arr (Defs . nubBy (\a b -> defName a == defName b) . unDefs)
 
 dump :: Arrow (~>) => Definitions ~> String
 dump = arr (intercalate "\n" . map one . unDefs)
