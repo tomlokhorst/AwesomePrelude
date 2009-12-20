@@ -61,6 +61,10 @@ instance Eq (Val JavaScript) Bool where
   (==) = fun2 "eq"  (\a b -> a ++ " == " ++ b)
   (/=) = fun2 "neq" (\a b -> a ++ " /= " ++ b)
 
+instance Eq (Val JavaScript) Num where
+  (==) = fun2 "eq"  (\a b -> a ++ " == " ++ b)
+  (/=) = fun2 "neq" (\a b -> a ++ " /= " ++ b)
+
 instance (Eq (Val JavaScript) a, Eq (Val JavaScript) b) => Eq (Val JavaScript) (a, b) where
   (==) = fun2 "eq"  (\a b -> a ++ " == " ++ b)
   (/=) = fun2 "neq" (\a b -> a ++ " /= " ++ b)
