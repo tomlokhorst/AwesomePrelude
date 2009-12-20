@@ -2,6 +2,8 @@ module Compiler.FreeVariables
 ( FreeVarA (..)
 , ExprFV
 , annotateExpression
+, DefinitionFV
+, DefinitionsFV
 , annotateDefinitions
 , dump
 )
@@ -12,7 +14,7 @@ import Compiler.Raw
 import Control.Arrow hiding (app)
 import Data.List (intercalate)
 import Data.Set hiding (map, insert)
-import Compiler.LiftDefinitions (DefinitionsA (..), Definitions)
+import Compiler.LiftDefinitions (DefinitionsA (..), Definitions, DefinitionA (..))
 
 data FreeVarA f a = FreeVarA { free :: Set String , expr :: f a }
 
@@ -37,19 +39,19 @@ annotateExpression globs = arr ow
     ae vs e = In (FreeVarA vs e)
     fv = free . out
 
+type DefinitionFV  = DefinitionA  FreeVarA
 type DefinitionsFV = DefinitionsA FreeVarA
 
 annotateDefinitions :: Arrow (~>) => Definitions ~> DefinitionsFV
-annotateDefinitions = arr $ \(Defs ds m) ->
-  let globs = fromList (map fst ds)
+annotateDefinitions = arr $ \(Defs ds) ->
+  let globs = fromList (map defName ds)
       ann   = annotateExpression globs
-  in Defs (map (fmap ann) ds) (ann m)
+  in Defs (map (\(Def n e) -> Def n (ann e)) ds)
 
 dump :: Arrow (~>) => DefinitionsFV ~> String
-dump = arr def
+dump = arr (intercalate "\n" . map one . unDefs)
   where
-    def (Defs ds m) = intercalate "\n" (map single (ds ++ [("__main", m)]))
-    single (d, e)   = d ++ " = " ++ rec e
+    one (Def d e) = "var " ++ d ++ " = " ++ rec e
 
     tr (App  f e ) = rec f ++ "(" ++ rec e ++ ")"
     tr (Con  c   ) = c

@@ -1,4 +1,4 @@
-module Compiler.Instantiate (instantiateLambas, printExpression) where
+module Compiler.InstantiateLambdas (instantiate, dump) where
 
 import Compiler.Generics
 import Compiler.Raw 
@@ -8,8 +8,8 @@ import Control.Monad.Reader
 import Data.List (intercalate)
 import qualified Lang.Value as V
 
-instantiateLambas :: Arrow (~>) => V.Val l i ~> Expr
-instantiateLambas = arr (flip runReader 0 . tr)
+instantiate :: Arrow (~>) => V.Val l i ~> Expr
+instantiate = arr (flip runReader 0 . tr)
   where
     tr :: V.Val l i -> Reader Integer Expr
     tr (V.App  f a)  = app <$> tr f <*> tr a
@@ -19,8 +19,8 @@ instantiateLambas = arr (flip runReader 0 . tr)
     tr (V.Prim s vs) = pure (prim s vs)
     tr (V.Var  v)    = pure (var v)
 
-printExpression :: Arrow (~>) => Expr ~> String
-printExpression = arr rec
+dump :: Arrow (~>) => Expr ~> String
+dump = arr rec
   where
     tr (App  f e)  = rec f ++ "(\n" ++ indent (rec e) ++ ")"
     tr (Con  c)    = c

@@ -1,5 +1,6 @@
 module Compiler.LiftDefinitions 
-( DefTable
+( DefinitionA (..)
+, Definition
 , DefinitionsA (..)
 , Definitions
 , inline
@@ -14,13 +15,14 @@ import Compiler.Raw
 import Control.Arrow hiding (app)
 import Data.List (intercalate)
 
-type DefTable a = [(String, FixA a ExprF)]
-
-data DefinitionsA a = Defs
-  { definitions :: DefTable a
-  , expression  :: FixA a ExprF
+data DefinitionA a = Def 
+  { defName :: String
+  , defExpr :: FixA a ExprF
   }
 
+newtype DefinitionsA a = Defs { unDefs :: [DefinitionA a] }
+
+type Definition  = DefinitionA Id
 type Definitions = DefinitionsA Id
 
 -- All named sub-expressions will be replaces by a variables that references
@@ -37,23 +39,22 @@ inline = foldId (In . Id . fmap defs)
 -- name/definition pairs. Because of the Map datatype all duplicate definitions
 -- will be joined to a single one.
 
-collect :: Expr -> DefTable Id
+collect :: Expr -> [Definition]
 collect = reduce defs
   where
-  defs d@(Name n _) = [(n, In (Id d))]
+  defs d@(Name n _) = [Def n (In (Id d))]
   defs _            = []
 
 -- Lift all definitions to the top-level and inline all references to these
 -- definitions in the main expression.
 
 lift :: Arrow (~>) => Expr ~> Definitions
-lift = arr (uncurry Defs . (collect &&& inline))
+lift = arr (\e -> Defs (collect e ++ [Def "__main" (inline e)]))
 
 dump :: Arrow (~>) => Definitions ~> String
-dump = arr def
+dump = arr (intercalate "\n" . map one . unDefs)
   where
-    def (Defs ds m) = intercalate "\n" (map single (ds ++ [("__main", m)]))
-    single (d, e)   = d ++ " = " ++ rec e
+    one (Def d e)  = "var " ++ d ++ " = " ++ rec e
 
     tr (App  f e ) = rec f ++ "(" ++ rec e ++ ")"
     tr (Con  c   ) = c

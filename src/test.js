@@ -1,22 +1,46 @@
-mul = /* 0 *//* mul */ /* 0 */function (v1) { return /* free: ["v1"] */function (v2) { return /* free: ["v1","v2"] */v1 * v2; }; }
-fix = /* 0 *//* fix */ /* 0 */function (v1) { return /* free: ["v1"] */fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); }
-list = /* 0 *//* list */ /* 0 */function (v3) { return /* free: ["v3"] */function (v4) { return /* free: ["v3","v4"] */function (v5) { return /* free: ["v3","v4","v5"] */v5.nil ? v3 : v4(v5.head)(v5.tail); }; }; }
-add = /* 0 *//* add */ /* 0 */function (v5) { return /* free: ["v5"] */function (v6) { return /* free: ["v5","v6"] */v5 + v6; }; }
-fix = /* 0 *//* fix */ /* 0 */function (v1) { return /* free: ["v1"] */fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); }
-list = /* 0 *//* list */ /* 0 */function (v3) { return /* free: ["v3"] */function (v4) { return /* free: ["v3","v4"] */function (v5) { return /* free: ["v3","v4","v5"] */v5.nil ? v3 : v4(v5.head)(v5.tail); }; }; }
-fix = /* 0 *//* fix */ /* 0 */function (v3) { return /* free: ["v3"] */fix = arguments.callee, v3(function (i) { return fix(v3)(i) }); }
-bool = /* 0 *//* bool */ /* 0 */function (v5) { return /* free: ["v5"] */function (v6) { return /* free: ["v5","v6"] */function (v7) { return /* free: ["v5","v6","v7"] */v7 ? v5(/*force*/) : v6(/*force*/); }; }; }
-cons = /* 0 *//* cons */ /* 0 */function (v6) { return /* free: ["v6"] */function (v7) { return /* free: ["v6","v7"] */{ head : v6, tail : v7 }; }; }
-sub = /* 0 *//* sub */ /* 0 */function (v6) { return /* free: ["v6"] */function (v7) { return /* free: ["v6","v7"] */v6 - v7; }; }
-eq = /* 0 *//* eq */ /* 0 */function (v5) { return /* free: ["v5"] */function (v6) { return /* free: ["v5","v6"] */v5 == v6; }; }
-cons = /* 0 *//* cons */ /* 0 */function (v5) { return /* free: ["v5"] */function (v6) { return /* free: ["v5","v6"] */{ head : v5, tail : v6 }; }; }
-fix = /* 0 *//* fix */ /* 0 */function (v1) { return /* free: ["v1"] */fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); }
-bool = /* 0 *//* bool */ /* 0 */function (v3) { return /* free: ["v3"] */function (v4) { return /* free: ["v3","v4"] */function (v5) { return /* free: ["v3","v4","v5"] */v5 ? v3(/*force*/) : v4(/*force*/); }; }; }
-cons = /* 0 *//* cons */ /* 0 */function (v4) { return /* free: ["v4"] */function (v5) { return /* free: ["v4","v5"] */{ head : v4, tail : v5 }; }; }
-sub = /* 0 *//* sub */ /* 0 */function (v4) { return /* free: ["v4"] */function (v5) { return /* free: ["v4","v5"] */v4 - v5; }; }
-eq = /* 0 *//* eq */ /* 0 */function (v3) { return /* free: ["v3"] */function (v4) { return /* free: ["v3","v4"] */v3 == v4; }; }
-maybe = /* 0 *//* maybe */ /* 0 */function (v1) { return /* free: ["v1"] */function (v2) { return /* free: ["v1","v2"] */function (v3) { return /* free: ["v1","v2","v3"] */v3.nothing ? v1 : v2(v3.just); }; }; }
-mul = /* 0 *//* mul */ /* 0 */function (v2) { return /* free: ["v2"] */function (v3) { return /* free: ["v2","v3"] */v2 * v3; }; }
-just = /* 0 *//* just */ /* 0 */function (v1) { return /* free: ["v1"] */{ just : v1 }; }
-sub = /* 0 *//* sub */ /* 0 */function (v1) { return /* free: ["v1"] */function (v2) { return /* free: ["v1","v2"] */v1 - v2; }; }
-__main = /* 0 *//* 0 *//* 0 */mul(/* 0 *//* 0 *//* 0 */fix(/* 0 */function (v1) { return /* free: ["v1"] */function (v2) { return /* free: ["v1","v2"] *//* free: ["v1"] *//* 0 *//* 0 */list(/* 0 */0)(/* free: ["v1"] */function (v3) { return /* free: ["v1","v3"] */function (v4) { return /* free: ["v1","v3","v4"] *//* free: ["v3"] *//* 0 */add(/* free: ["v3"] */v3)(/* free: ["v1","v4"] *//* free: ["v1"] */v1(/* free: ["v4"] */v4)); }; })(/* free: ["v2"] */v2); }; })(/* 0 *//* 0 *//* 0 */fix(/* 0 */function (v1) { return /* free: ["v1"] */function (v2) { return /* free: ["v1","v2"] *//* free: ["v1"] *//* 0 *//* 0 */list(/* 0 *//* 0 *//* 0 */fix(/* 0 */function (v3) { return /* free: ["v3"] */function (v4) { return /* free: ["v3","v4"] *//* free: ["v3","v4"] *//* 0 *//* 0 */bool(/* 0 */function (v5) { return /* free: ["v5"] *//* 0 *//* 0 */function (v6) { return /* free: ["v6"] */function (v7) { return /* free: ["v6"] */v6; }; }(/* 0 */{ nil : 1 })(/* free: ["v5"] */v5); })(/* free: ["v3","v4"] */function (v5) { return /* free: ["v3","v4","v5"] *//* free: ["v3","v4"] *//* 0 */function (v6) { return /* free: ["v6"] */function (v7) { return /* free: ["v6"] */v6; }; }(/* free: ["v3","v4"] *//* 0 *//* 0 */cons(/* 0 */8)(/* free: ["v3","v4"] *//* free: ["v3"] */v3(/* free: ["v4"] *//* free: ["v4"] *//* 0 */sub(/* free: ["v4"] */v4)(/* 0 */1))))(/* free: ["v5"] */v5); })(/* free: ["v4"] *//* free: ["v4"] *//* 0 */eq(/* free: ["v4"] */v4)(/* 0 */0)); }; })(/* 0 */3))(/* free: ["v1"] */function (v3) { return /* free: ["v1","v3"] */function (v4) { return /* free: ["v1","v3","v4"] *//* free: ["v3"] *//* 0 */cons(/* free: ["v3"] */v3)(/* free: ["v1","v4"] *//* free: ["v1"] */v1(/* free: ["v4"] */v4)); }; })(/* free: ["v2"] */v2); }; })(/* 0 *//* 0 *//* 0 */fix(/* 0 */function (v1) { return /* free: ["v1"] */function (v2) { return /* free: ["v1","v2"] *//* free: ["v1","v2"] *//* 0 *//* 0 */bool(/* 0 */function (v3) { return /* free: ["v3"] *//* 0 *//* 0 */function (v4) { return /* free: ["v4"] */function (v5) { return /* free: ["v4"] */v4; }; }(/* 0 */{ nil : 1 })(/* free: ["v3"] */v3); })(/* free: ["v1","v2"] */function (v3) { return /* free: ["v1","v2","v3"] *//* free: ["v1","v2"] *//* 0 */function (v4) { return /* free: ["v4"] */function (v5) { return /* free: ["v4"] */v4; }; }(/* free: ["v1","v2"] *//* 0 *//* 0 */cons(/* 0 */8)(/* free: ["v1","v2"] *//* free: ["v1"] */v1(/* free: ["v2"] *//* free: ["v2"] *//* 0 */sub(/* free: ["v2"] */v2)(/* 0 */1))))(/* free: ["v3"] */v3); })(/* free: ["v2"] *//* free: ["v2"] *//* 0 */eq(/* free: ["v2"] */v2)(/* 0 */0)); }; })(/* 0 */3))))(/* 0 *//* 0 *//* 0 *//* 0 */maybe(/* 0 */4)(/* 0 */function (v1) { return /* free: ["v1"] *//* free: ["v1"] *//* 0 */mul(/* free: ["v1"] */v1)(/* 0 */8); })(/* 0 *//* 0 */just(/* 0 *//* 0 *//* 0 */sub(/* 0 */3)(/* 0 */2))))
+var mul = /* mul */ function (v1) { return function (v2) { return v1 * v2; }; }
+var fix = /* fix */ function (v1) { return fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); }
+var list = /* list */ function (v3) { return function (v4) { return function (v5) { return v5.nil ? v3 : v4(v5.head)(v5.tail); }; }; }
+var add = /* add */ function (v5) { return function (v6) { return v5 + v6; }; }
+var fix = /* fix */ function (v1) { return fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); }
+var list = /* list */ function (v3) { return function (v4) { return function (v5) { return v5.nil ? v3 : v4(v5.head)(v5.tail); }; }; }
+var fix = /* fix */ function (v3) { return fix = arguments.callee, v3(function (i) { return fix(v3)(i) }); }
+var bool = /* bool */ function (v5) { return function (v6) { return function (v7) { return v7 ? v5(/*force*/) : v6(/*force*/); }; }; }
+var cons = /* cons */ function (v6) { return function (v7) { return { head : v6, tail : v7 }; }; }
+var sub = /* sub */ function (v6) { return function (v7) { return v6 - v7; }; }
+var eq = /* eq */ function (v5) { return function (v6) { return v5 == v6; }; }
+var cons = /* cons */ function (v5) { return function (v6) { return { head : v5, tail : v6 }; }; }
+var fix = /* fix */ function (v1) { return fix = arguments.callee, v1(function (i) { return fix(v1)(i) }); }
+var bool = /* bool */ function (v3) { return function (v4) { return function (v5) { return v5 ? v3(/*force*/) : v4(/*force*/); }; }; }
+var cons = /* cons */ function (v4) { return function (v5) { return { head : v4, tail : v5 }; }; }
+var sub = /* sub */ function (v4) { return function (v5) { return v4 - v5; }; }
+var eq = /* eq */ function (v3) { return function (v4) { return v3 == v4; }; }
+var maybe = /* maybe */ function (v1) { return function (v2) { return function (v3) { return v3.nothing ? v1 : v2(v3.just); }; }; }
+var mul = /* mul */ function (v2) { return function (v3) { return v2 * v3; }; }
+var just = /* just */ function (v1) { return { just : v1 }; }
+var sub = /* sub */ function (v1) { return function (v2) { return v1 - v2; }; }
+var c1 = list(0)
+var c2 = fix(function (v1) { return function (v2) { return c1(function (v3) { return function (v4) { return add(v3)(v1(v4)); }; })(v2); }; })
+var c3 = function (v6) { return function (v7) { return v6; }; }({ nil : 1 })
+var c4 = bool(function (v5) { return c3(v5); })
+var c5 = cons(8)
+var c6 = fix(function (v3) { return function (v4) { return c4(function (v5) { return function (v6) { return function (v7) { return v6; }; }(c5(v3(sub(v4)(1))))(v5); })(eq(v4)(0)); }; })
+var c7 = c6(3)
+var c8 = list(c7)
+var c9 = fix(function (v1) { return function (v2) { return c8(function (v3) { return function (v4) { return cons(v3)(v1(v4)); }; })(v2); }; })
+var c10 = function (v4) { return function (v5) { return v4; }; }({ nil : 1 })
+var c11 = bool(function (v3) { return c10(v3); })
+var c12 = cons(8)
+var c13 = fix(function (v1) { return function (v2) { return c11(function (v3) { return function (v4) { return function (v5) { return v4; }; }(c12(v1(sub(v2)(1))))(v3); })(eq(v2)(0)); }; })
+var c14 = c13(3)
+var c15 = c9(c14)
+var c16 = c2(c15)
+var c17 = mul(c16)
+var c18 = maybe(4)
+var c19 = c18(function (v1) { return mul(v1)(8); })
+var c20 = sub(3)
+var c21 = c20(2)
+var c22 = just(c21)
+var c23 = c19(c22)
+var c24 = c17(c23)
+var __main = c24
