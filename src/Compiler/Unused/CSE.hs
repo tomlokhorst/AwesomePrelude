@@ -13,3 +13,14 @@ reifyGraphA = Kleisli R.reifyGraph
 commonSubExpressionElimination :: Kleisli IO Expr (R.Graph ExprF)
 commonSubExpressionElimination = arr cse . Kleisli R.reifyGraph
 
+-- MuRef instances for Data.Reify.
+
+instance Traversable f => R.MuRef (FixA Id f) where
+  type R.DeRef (Fix f) = f
+  mapDeRef f = traverse f . unId . out
+
+data Graph = Graph
+  { nodes :: Map String (ExprF String)
+  , first :: String
+  }
+
