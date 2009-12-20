@@ -18,5 +18,6 @@ compiler = runKleisli
 --   >>> addLambdaAbstractions
 --   >>> collectSuperCombinators
 --   >>> printDefinitionsWithFreeVariables
+--   >>> printAnonymousExpression
   >>> printDefinitions
 

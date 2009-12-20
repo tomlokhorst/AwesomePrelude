@@ -1,4 +1,4 @@
-module Compiler.Instantiate (instantiateLambas, anonymousExprPrinter) where
+module Compiler.Instantiate (instantiateLambas, printAnonymousExpression) where
 
 import Compiler.Generics
 import Compiler.Raw 
@@ -19,8 +19,8 @@ instantiateLambas = arr (flip runReader 0 . tr)
     tr (V.Var  v)    = pure (var v)
     tr (V.Name n e)  = def n <$> tr e
 
-anonymousExprPrinter :: Arrow (~>) => Expr ~> String
-anonymousExprPrinter = arr tr
+printAnonymousExpression :: Arrow (~>) => Expr ~> String
+printAnonymousExpression = arr tr
   where
     tr (In (Id (App   f e)))  = tr f ++ "(\n" ++ indent (tr e) ++ ")"
     tr (In (Id (Con   c)))    = c
