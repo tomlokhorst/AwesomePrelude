@@ -10,7 +10,7 @@ module Compiler.FreeVariables
 where
 
 import Compiler.Generics
-import Compiler.Raw
+import Compiler.Expr
 import Control.Arrow hiding (app)
 import Data.List (intercalate)
 import Data.Set hiding (map, insert)

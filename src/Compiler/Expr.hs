@@ -5,7 +5,7 @@
   , DeriveFoldable
   , DeriveTraversable
  #-}
-module Compiler.Raw where
+module Compiler.Expr where
 
 import Compiler.Generics
 import Control.Monad.State
@@ -13,7 +13,7 @@ import Data.Foldable hiding (elem, mapM_, concatMap, concat, foldr)
 import Data.Traversable hiding (mapM)
 import Prelude hiding (lookup)
 
--- Raw value datatype.
+-- Expression datatype.
 
 type Con  = String
 type Name = String

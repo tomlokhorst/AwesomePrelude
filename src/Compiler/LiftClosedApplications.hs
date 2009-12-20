@@ -3,7 +3,7 @@ module Compiler.LiftClosedApplications (lift) where
 import Compiler.FreeVariables (DefinitionsFV, FreeVarA (..))
 import Compiler.Generics
 import Compiler.LiftDefinitions (DefinitionA (..), DefinitionsA (..), Definition, Definitions)
-import Compiler.Raw
+import Compiler.Expr
 import Control.Applicative
 import Control.Arrow hiding (app)
 import Control.Monad.State hiding (lift)

@@ -7,7 +7,7 @@ where
 import Control.Monad.State
 import Control.Applicative
 import Compiler.Generics
-import Compiler.Raw
+import Compiler.Expr
 import Compiler.FreeVariables
 import Control.Arrow hiding (app)
 import qualified Data.Set as S

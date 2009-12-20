@@ -1,7 +1,7 @@
 module Compiler.InstantiateLambdas (instantiate, dump) where
 
 import Compiler.Generics
-import Compiler.Raw 
+import Compiler.Expr 
 import Control.Applicative
 import Control.Arrow hiding (app)
 import Control.Monad.Reader

@@ -4,7 +4,7 @@ First, we will start of with the module header and some imports.
 
 > import Compiler.Generics
 > import Control.Arrow hiding (app)
-> import Compiler.Raw
+> import Compiler.Expr
 > import qualified Data.Set as S
 > import Control.Monad.State
 
