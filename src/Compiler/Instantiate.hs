@@ -1,4 +1,4 @@
-module Compiler.Instantiate (instantiateLambas, printAnonymousExpression) where
+module Compiler.Instantiate (instantiateLambas, printExpression) where
 
 import Compiler.Generics
 import Compiler.Raw 
@@ -14,21 +14,21 @@ instantiateLambas = arr (flip runReader 0 . tr)
     tr :: V.Val l i -> Reader Integer Expr
     tr (V.App  f a)  = app <$> tr f <*> tr a
     tr (V.Con  c)    = pure (con c)
-    tr (V.Prim s vs) = pure (prim s vs)
     tr (V.Lam  f)    = local (+1) (ask >>= \r -> let v = 'v':show r in lam [v] <$> tr (f (V.Var v)))
+    tr (V.Name n e)  = name n <$> tr e
+    tr (V.Prim s vs) = pure (prim s vs)
     tr (V.Var  v)    = pure (var v)
-    tr (V.Name n e)  = def n <$> tr e
 
-printAnonymousExpression :: Arrow (~>) => Expr ~> String
-printAnonymousExpression = arr tr
+printExpression :: Arrow (~>) => Expr ~> String
+printExpression = arr rec
   where
-    tr (In (Id (App   f e)))  = tr f ++ "(\n" ++ indent (tr e) ++ ")"
-    tr (In (Id (Con   c)))    = c
-    tr (In (Id (Prim  s vs))) = s vs ++ " /* free: " ++ intercalate ", " vs ++ " */"
-    tr (In (Id (Lam   as e))) = "(function (" ++ intercalate ", " as ++ ")" ++ "\n{\n" ++ indent ("return " ++ tr e ++ ";") ++ "\n})"
-    tr (In (Id (Var   v)))    = v
-    tr (In (Id (Def   n e)))  = "/* " ++ n ++ "*/ " ++ tr e
-    tr (In (Id (More  es)))   = intercalate "\n" (map tr es)
+    tr (App  f e)  = rec f ++ "(\n" ++ indent (rec e) ++ ")"
+    tr (Con  c)    = c
+    tr (Lam  as e) = "(function (" ++ intercalate ", " as ++ ")" ++ "\n{\n" ++ indent ("return " ++ rec e ++ ";") ++ "\n})"
+    tr (Name n e)  = "/* " ++ n ++ "*/ " ++ rec e
+    tr (Prim s vs) = s vs ++ " /* free: " ++ intercalate ", " vs ++ " */"
+    tr (Var  v)    = v
 
+    rec = tr . unId . out
     indent = unlines . map ("  "++) . lines
 

@@ -1,21 +1,21 @@
 {-# LANGUAGE Arrows #-}
 module Compiler.Pipeline where
 
-import Compiler.FreeVariables
 import Compiler.Instantiate
-import Compiler.LiftDefinitions
-import Compiler.LiftClosures
--- import Compiler.LiftLambdas
 import Control.Arrow
 import Lang.Value
+import qualified Compiler.FreeVariables as FreeVariables
+import qualified Compiler.LiftDefinitions as Definitions
+-- import Compiler.LiftClosures
+-- import Compiler.LiftLambdas
 
 compiler :: Val l i -> IO String
 compiler = runKleisli
     $ instantiateLambas
-  >>> liftDefinitions
-  >>> annotateWithFreeVariables
-  >>> liftClosures
-  >>> printDefinitions
+  >>> Definitions.lift
+  >>> FreeVariables.annotateDefinitions
+--   >>> liftClosures
+  >>> FreeVariables.dump
 
 --   >>> addLambdaAbstractions
 --   >>> collectSuperCombinators

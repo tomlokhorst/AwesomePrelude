@@ -1,53 +1,66 @@
 module Compiler.LiftDefinitions 
-( inlineDefinitions
-, collectDefinitions
-, liftDefinitions
-, printDefinitions
+( DefTable
+, DefinitionsA (..)
+, Definitions
+, inline
+, collect
+, lift
+, dump
 )
 where
 
 import Compiler.Generics
 import Compiler.Raw 
-import Data.Map (Map, singleton, empty, elems)
 import Control.Arrow hiding (app)
 import Data.List (intercalate)
 
--- All named definitions within expression will be replaces by a variables with
--- the name of the definitions.
+type DefTable a = [(String, FixA a ExprF)]
 
-inlineDefinitions :: Expr -> Expr
-inlineDefinitions = foldId (In . Id . fmap defs)
+data DefinitionsA a = Defs
+  { definitions :: DefTable a
+  , expression  :: FixA a ExprF
+  }
+
+type Definitions = DefinitionsA Id
+
+-- All named sub-expressions will be replaces by a variables that references
+-- the definition that will be created. All named sub-expression MUST NOT
+-- contain any free variables.
+
+inline :: Expr -> Expr
+inline = foldId (In . Id . fmap defs)
   where
-  defs (In (Id (Def n _))) = var n
-  defs e                   = e
+  defs (In (Id (Name n _))) = var n
+  defs e                    = e
 
 -- Collect all definitions from an expression tree and return a map with
 -- name/definition pairs. Because of the Map datatype all duplicate definitions
 -- will be joined to a single one.
 
-collectDefinitions :: Expr -> Map String Expr
-collectDefinitions = reduce defs
+collect :: Expr -> DefTable Id
+collect = reduce defs
   where
-  defs d@(Def n _) = singleton n (In (Id d))
-  defs _           = empty
+  defs d@(Name n _) = [(n, In (Id d))]
+  defs _            = []
 
 -- Lift all definitions to the top-level and inline all references to these
--- definitions.
+-- definitions in the main expression.
 
-liftDefinitions :: Arrow (~>) => Expr ~> Expr
-liftDefinitions = arr (\e -> more (elems (collectDefinitions e) ++ [def "__main" (tr e)]))
-  where
-    tr d@(In (Id (Def _ _))) = d
-    tr e                     = inlineDefinitions e
+lift :: Arrow (~>) => Expr ~> Definitions
+lift = arr (uncurry Defs . (collect &&& inline))
 
-printDefinitions :: Arrow (~>) => Expr ~> String
-printDefinitions = arr tr
+dump :: Arrow (~>) => Definitions ~> String
+dump = arr def
   where
-    tr (In (Id (App  f e)))  = tr f ++ "(" ++ tr e ++ ")"
-    tr (In (Id (Con  c)))    = c
-    tr (In (Id (Prim s vf))) = s vf
-    tr (In (Id (Lam  as e))) = "function (" ++ intercalate ", " as ++ ") { return " ++ tr e ++ ";" ++ " }"
-    tr (In (Id (Var  v)))    = v
-    tr (In (Id (Def  n e)))  = n ++ " = " ++ tr e
-    tr (In (Id (More es)))   = intercalate "\n" (map tr es)
+    def (Defs ds m) = intercalate "\n" (map single (ds ++ [("__main", m)]))
+    single (d, e)   = d ++ " = " ++ rec e
+
+    tr (App  f e ) = rec f ++ "(" ++ rec e ++ ")"
+    tr (Con  c   ) = c
+    tr (Prim s vf) = s vf
+    tr (Lam  as e) = "function (" ++ intercalate ", " as ++ ") { return " ++ rec e ++ ";" ++ " }"
+    tr (Var  v   ) = v
+    tr (Name n e ) = "/* " ++ n ++ " */ " ++ rec e
+
+    rec = tr . unId . out
 
