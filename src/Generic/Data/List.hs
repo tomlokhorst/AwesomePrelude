@@ -15,10 +15,13 @@ instance (FunC j, ListC j) => Functor j [] where
   fmap f = foldr (\a r -> f a `cons` r) nil
 
 singleton :: ListC j => j a -> j [a]
-singleton a = cons a nil
+singleton a = a `cons` nil
 
 foldr :: (FunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
+
+replicate :: (ListC j, NumC j, Eq j Num, BoolC j, FunC j) => j Num -> j a -> j [a]
+replicate n a = fix (\r -> lam (\y -> bool nil (a `cons` (r `app` (y - 1))) (y == 0))) `app` n
 
 (++) :: (FunC j, ListC j) => j [a] -> j [a] -> j [a]
 xs ++ ys = foldr cons ys xs
