@@ -43,11 +43,11 @@ liftDefinitions = arr (\e -> more (elems (collectDefinitions e) ++ [def "__main"
 printDefinitions :: Arrow (~>) => Expr ~> String
 printDefinitions = arr tr
   where
-    tr (In (Id (App   f e)))  = tr f ++ "(" ++ tr e ++ ")"
-    tr (In (Id (Con   c)))    = c
-    tr (In (Id (Prim  s _)))  = s
-    tr (In (Id (Lam   as e))) = "(function (" ++ intercalate ", " as ++ ")" ++ "{ " ++ "return " ++ tr e ++ ";" ++ " })"
-    tr (In (Id (Var   v)))    = v
-    tr (In (Id (Def   n e)))  = n ++ " = " ++ tr e
-    tr (In (Id (More  es)))   = intercalate "\n" (map tr es)
+    tr (In (Id (App  f e)))  = tr f ++ "(" ++ tr e ++ ")"
+    tr (In (Id (Con  c)))    = c
+    tr (In (Id (Prim s vf))) = s vf
+    tr (In (Id (Lam  as e))) = "function (" ++ intercalate ", " as ++ ") { return " ++ tr e ++ ";" ++ " }"
+    tr (In (Id (Var  v)))    = v
+    tr (In (Id (Def  n e)))  = n ++ " = " ++ tr e
+    tr (In (Id (More es)))   = intercalate "\n" (map tr es)
 

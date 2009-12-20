@@ -24,12 +24,12 @@ import qualified Data.Set as Set
 data ExprF f =
     App   f f
   | Con   String
-  | Prim  String [String]
+  | Prim  ([String] -> String) [String]
   | Lam   [String] f
   | Var   String
   | Def   String f
   | More  [f]
-  deriving (Eq, Ord, Functor, Foldable, Traversable)
+  deriving (Functor, Foldable, Traversable)
 
 type Expr = Fix ExprF
 
@@ -41,8 +41,8 @@ app a b = In (Id (App a b))
 con :: String -> Expr
 con a = In (Id (Con a))
 
-prim :: String -> [String] -> Expr
-prim a as = In (Id (Prim a as))
+prim :: ([String] -> String) -> [String] -> Expr
+prim f as = In (Id (Prim f as))
 
 lam :: [String] -> Expr -> Expr
 lam as f = In (Id (Lam as f))
@@ -70,13 +70,13 @@ data Graph = Graph
 -- Generic value traversal.
 
 foldGraph
-  :: (Graph -> [a] -> [a] -> String -> String -> String   -> a)
-  -> (Graph               -> String -> String             -> a)
-  -> (Graph               -> String -> String -> [String] -> a)
-  -> (Graph -> [a]        -> String -> [String] -> String -> a)
-  -> (Graph               -> String -> String             -> a)
-  -> (Graph -> [a]        -> String -> String -> String   -> a)
-  -> (Graph -> [[a]]      -> String -> [String]           -> a)
+  :: (Graph -> [a] -> [a] -> String -> String -> String                 -> a)
+  -> (Graph               -> String -> String                           -> a)
+  -> (Graph               -> String -> ([String] -> String) -> [String] -> a)
+  -> (Graph -> [a]        -> String -> [String] -> String               -> a)
+  -> (Graph               -> String -> String                           -> a)
+  -> (Graph -> [a]        -> String -> String -> String                 -> a)
+  -> (Graph -> [[a]]      -> String -> [String]                         -> a)
   -> Graph
   -> [a]
 foldGraph f0 f1 f2 f3 f4 f5 f6 g@(Graph m r) = evalState (folder (r, r `from` m)) Set.empty

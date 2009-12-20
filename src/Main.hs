@@ -5,14 +5,8 @@ import Generic.Prelude
 import Lang.JavaScript
 import qualified Prelude as P
 
-jsList :: Js [Num]
-jsList = replicate 700 1
-
 jsSumList :: Js Num
-jsSumList = sum (jsList ++ jsList) * sum jsList
-
-jsApp :: Js Num
-jsApp = maybe 10 (*2) (just (4 * 3))
+jsSumList = sum (replicate 3 8 ++ replicate 3 8) * maybe 4 (*8) (just (3 - 2))
 
 main :: P.IO ()
 main =

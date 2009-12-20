@@ -47,7 +47,7 @@ printDefinitionsWithFreeVariables = arr top
   top (In (FreeVarA vf x)) = (if size vf /= 0 then "/* free: " ++ show (toList vf) ++ " */" else "/* 0 */") ++ tr x
   tr (App   f e)  = top f ++ "(" ++ top e ++ ")"
   tr (Con   c)    = c
-  tr (Prim  s _)  = s
+  tr (Prim  s vf) = s vf
   tr (Lam   as e) = "(function (" ++ intercalate ", " as ++ ")" ++ "{ " ++ "return " ++ top e ++ ";" ++ " })"
   tr (Var   v)    = v
   tr (Def   n e)  = n ++ " = " ++ top e

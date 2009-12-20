@@ -24,7 +24,7 @@ printAnonymousExpression = arr tr
   where
     tr (In (Id (App   f e)))  = tr f ++ "(\n" ++ indent (tr e) ++ ")"
     tr (In (Id (Con   c)))    = c
-    tr (In (Id (Prim  s vs))) = s ++ " /* free: " ++ intercalate ", " vs ++ " */"
+    tr (In (Id (Prim  s vs))) = s vs ++ " /* free: " ++ intercalate ", " vs ++ " */"
     tr (In (Id (Lam   as e))) = "(function (" ++ intercalate ", " as ++ ")" ++ "\n{\n" ++ indent ("return " ++ tr e ++ ";") ++ "\n})"
     tr (In (Id (Var   v)))    = v
     tr (In (Id (Def   n e)))  = "/* " ++ n ++ "*/ " ++ tr e

@@ -15,9 +15,9 @@ compiler = runKleisli
   >>> liftDefinitions
   >>> annotateWithFreeVariables
   >>> liftClosures
+  >>> printDefinitions
+
 --   >>> addLambdaAbstractions
 --   >>> collectSuperCombinators
 --   >>> printDefinitionsWithFreeVariables
 --   >>> printAnonymousExpression
-  >>> printDefinitions
-
