@@ -29,6 +29,15 @@ data ExprF f =
   | Var   Var
   deriving (Functor, Foldable, Traversable)
 
+instance Eq f => Eq (ExprF f) where
+  App   f g  == App   h i  = f == h && g == i
+  Con   c    == Con   d    = c == d
+  Lam   vs e == Lam   ws f = vs == ws && e == f
+  Name  n e  == Name  m f  = n == m && e == f
+  Prim  b vs == Prim  c ws = b vs == c ws
+  Var   v    == Var   w    = v == w
+  _          == _          = False
+
 type ExprA a = FixA a ExprF
 type Expr    = Fix ExprF
 

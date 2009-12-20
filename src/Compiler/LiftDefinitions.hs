@@ -21,8 +21,11 @@ data DefinitionA a = Def
 
 newtype DefinitionsA a = Defs { unDefs :: [DefinitionA a] }
 
-type Definition  = DefinitionA Id
+type Definition  = DefinitionA  Id
 type Definitions = DefinitionsA Id
+
+deriving instance Eq (DefinitionA  Id)
+deriving instance Eq (DefinitionsA Id)
 
 -- All named sub-expressions will be replaces by a variables that references
 -- the definition that will be created. All named sub-expression MUST NOT
@@ -41,8 +44,8 @@ inline = foldId (In . Id . fmap defs)
 collect :: Expr -> [Definition]
 collect = reduce defs
   where
-  defs d@(Name n _) = [Def n (In (Id d))]
-  defs _            = []
+  defs (Name n d) = [Def n d]
+  defs _          = []
 
 -- Lift all definitions to the top-level and inline all references to these
 -- definitions in the main expression.

@@ -11,25 +11,27 @@ import Data.Traversable
 import qualified Data.Set as S
 
 lift :: Arrow (~>) => DefinitionsFV ~> Definitions
-lift = arr (Defs . concatMap single . unDefs)
+lift = arr (Defs . concat . zipWith single [0..] . unDefs)
 
   where
-  single (Def n e) = let (g, (_, ds)) = runState (coll e) (0, []) in ds ++ [Def n g]
+  single i (Def n x) = let (g, (_, ds)) = runState (coll True x) (i, []) in ds ++ [Def n g]
 
-  coll (In (FreeVarA vf e)) =
-    if S.size vf == 0 && liftable e
-      then var . mk <$> (rec e >>= store)
-      else rec e
+    where
+    coll top (In (FreeVarA vf e)) =
+      if not top && S.size vf == 0 && liftable e
+        then var . mk <$> (rec e >>= store)
+        else rec e
 
-  rec = fmap (In . Id) . traverse coll
+    rec = fmap (In . Id) . traverse (coll False)
 
-  liftable (App _ _) = True
-  liftable _         = False
+    liftable (App _ _) = True
+    liftable (Lam _ _) = True
+    liftable _         = False
 
-  mk = ('c':) . show
+    mk v = 'c': (show i ++ "_" ++ show v)
 
-  store :: Expr -> State (Integer, [Definition]) Integer
-  store e =
-    do modify $ \(i, defs) -> (i + 1, defs ++ [Def (mk (i + 1)) e])
-       gets fst
+    store :: Expr -> State (Integer, [Definition]) Integer
+    store e =
+      do modify $ \(j, defs) -> (j + 1, defs ++ [Def (mk (j + 1)) e])
+         gets fst
 

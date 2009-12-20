@@ -10,6 +10,8 @@ import qualified Compiler.InstantiateLambdas     as Lambdas
 import qualified Compiler.FreeVariables          as FreeVariables
 import qualified Compiler.LiftClosedApplications as ClosedApplications
 import qualified Compiler.LiftDefinitions        as Definitions
+import qualified Compiler.ReindexParamaters      as Parameters
+import qualified Compiler.CommonDefinitions      as CommonDefinitions
 
 type a :-> b = Kleisli IO a b
 
@@ -20,5 +22,7 @@ compiler = runKleisli
   >>> ( Definitions.eliminiateDoubles     :: Definitions   :-> Definitions   )
   >>> ( FreeVariables.annotateDefinitions :: Definitions   :-> DefinitionsFV )
   >>> ( ClosedApplications.lift           :: DefinitionsFV :-> Definitions   )
+  >>> ( Parameters.reindex                :: Definitions   :-> Definitions   )
+  >>> ( CommonDefinitions.eliminate       :: Definitions   :-> Definitions   )
   >>> ( Definitions.dump                  :: Definitions   :-> String        )
 

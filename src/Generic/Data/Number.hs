@@ -3,6 +3,11 @@ module Generic.Data.Number where
 import Prelude ()
 import qualified Prelude
 
+infixl 6 +
+infixl 7 *
+infixl 7 /
+infixl 6 -
+
 data Num
 class NumC j where
   (+) :: j Num -> j Num -> j Num
