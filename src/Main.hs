@@ -6,7 +6,7 @@ import Lang.JavaScript
 import qualified Prelude as P
 
 jsList :: Js [Num]
-jsList = 1 `cons` (2 `cons` (3 `cons` (4 `cons` (5 `cons` (6 `cons` (7 `cons` nil))))))
+jsList = replicate 700 1
 
 jsSumList :: Js Num
 jsSumList = sum (jsList ++ jsList) * sum jsList
