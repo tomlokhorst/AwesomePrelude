@@ -10,13 +10,13 @@ module Compiler.LiftDefinitions
 where
 
 import Compiler.Generics
-import Compiler.Expr 
+import Compiler.Expression 
 import Control.Arrow hiding (app)
 import Data.List (intercalate, nubBy)
 
 data DefinitionA a = Def 
   { defName :: String
-  , defExpr :: FixA a ExprF
+  , defExpr :: FixA a ExpressionF
   }
 
 newtype DefinitionsA a = Defs { unDefs :: [DefinitionA a] }
@@ -31,7 +31,7 @@ deriving instance Eq (DefinitionsA Id)
 -- the definition that will be created. All named sub-expression MUST NOT
 -- contain any free variables.
 
-inline :: Expr -> Expr
+inline :: Expression -> Expression
 inline = foldId (In . Id . fmap defs)
   where
   defs (In (Id (Name n _))) = var n
@@ -41,7 +41,7 @@ inline = foldId (In . Id . fmap defs)
 -- name/definition pairs. Because of the Map datatype all duplicate definitions
 -- will be joined to a single one.
 
-collect :: Expr -> [Definition]
+collect :: Expression -> [Definition]
 collect = reduce defs
   where
   defs (Name n d) = [Def n d]
@@ -50,7 +50,7 @@ collect = reduce defs
 -- Lift all definitions to the top-level and inline all references to these
 -- definitions in the main expression.
 
-lift :: Arrow (~>) => Expr ~> Definitions
+lift :: Arrow (~>) => Expression ~> Definitions
 lift = arr (\e -> Defs (collect e ++ [Def "__main" (inline e)]))
 
 eliminiateDoubles :: Arrow (~>) => Definitions ~> Definitions

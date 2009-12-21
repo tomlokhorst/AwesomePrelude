@@ -7,7 +7,7 @@ where
 import Control.Monad.State
 import Control.Applicative
 import Compiler.Generics
-import Compiler.Expr
+import Compiler.Expression
 import Compiler.FreeVariables
 import Control.Arrow hiding (app)
 import qualified Data.Set as S
@@ -15,7 +15,7 @@ import qualified Data.Set as S
 -- The function |addLambdaAbstractions| changes every lambda expression |e| by
 -- adding abstractions for all free variables in |e| (and an |App| as well).
 
-addLambdaAbstractions :: Arrow (~>) => ExprFV ~> Expr
+addLambdaAbstractions :: Arrow (~>) => ExprFV ~> Expression
 addLambdaAbstractions = arr ab
   where
   ab (In (FreeVarA _ (App l r)))   = app (ab l) (ab r)
@@ -33,13 +33,13 @@ addLambdaAbstractions = arr ab
 
 data CollectState = CollectState 
   { freshVariable :: Int
-  , bindings      :: [Expr]
+  , bindings      :: [Expression]
   }
 
 -- |collectSuperCombinators| lifts all the lambdas to supercombinators (as
 -- described in the paper).
 
-collectSuperCombinators :: Arrow (~>) => Expr ~> Expr
+collectSuperCombinators :: Arrow (~>) => Expression ~> Expression
 collectSuperCombinators = arr $ \ex ->
   let (ex', st) = runState (rec ex) (CollectState 0 [])
   in more (def "main" ex' : bindings st)

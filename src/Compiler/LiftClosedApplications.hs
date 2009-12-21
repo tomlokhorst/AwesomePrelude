@@ -3,7 +3,7 @@ module Compiler.LiftClosedApplications (lift) where
 import Compiler.FreeVariables (DefinitionsFV, FreeVarA (..))
 import Compiler.Generics
 import Compiler.LiftDefinitions (DefinitionA (..), DefinitionsA (..), Definition, Definitions)
-import Compiler.Expr
+import Compiler.Expression
 import Control.Applicative
 import Control.Arrow hiding (app)
 import Control.Monad.State hiding (lift)
@@ -30,7 +30,7 @@ lift = arr (Defs . concat . zipWith single [0..] . unDefs)
 
     mk v = 'c': (show i ++ "_" ++ show v)
 
-    store :: Expr -> State (Integer, [Definition]) Integer
+    store :: Expression -> State (Integer, [Definition]) Integer
     store e =
       do modify $ \(j, defs) -> (j + 1, defs ++ [Def (mk (j + 1)) e])
          gets fst

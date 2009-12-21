@@ -4,16 +4,16 @@ First, we will start of with the module header and some imports.
 
 > import Compiler.Generics
 > import Control.Arrow hiding (app)
-> import Compiler.Expr
+> import Compiler.Expression
 > import qualified Data.Set as S
 > import Control.Monad.State
 
 Lambda-lifting is done by doing three steps, as defined in 
 <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.30.1125">A modular fully-lazy lambda lifter in Haskell</a>
 
-Lambda-lifting gives us a list of definitions. The |Expr| datatype doesn't contain any |Abs| terms.
+Lambda-lifting gives us a list of definitions. The |Expression| datatype doesn't contain any |Abs| terms.
 
-> liftLambdas :: Kleisli IO Expr Expr
+> liftLambdas :: Kleisli IO Expression Expression
 > liftLambdas = arr (more . reverse . collectSCs . abstract . freeVars)
 
 The |freeVars| function will annotate every expression with its variables. The type of such an annotated expression is:
@@ -30,12 +30,12 @@ These are some smart constructor/destructor functions:
 
 |freeVars| operates on simple fixpoints of |ExprF|:
 
-> freeVars :: Expr -> AnnExpr (S.Set String)
+> freeVars :: Expression -> AnnExpr (S.Set String)
 > freeVars = freeVars' . out
 
 |freeVars'| does the heavy lifting:
 
-> freeVars' :: ExprF (Expr) -> AnnExpr (S.Set String)
+> freeVars' :: ExprF (Expression) -> AnnExpr (S.Set String)
 > freeVars' (App l r)      =  let l' = freeVars l
 >                                 r' = freeVars r
 >                             in  ae (S.union (fv l') (fv r')) (App l' r')
@@ -53,7 +53,7 @@ These are some smart constructor/destructor functions:
 The function |abstract| changes every lambda expression |e| by adding
 abstractions for all free variables in |e| (and an |App| as well).
 
-> abstract :: AnnExpr (S.Set String) -> Expr
+> abstract :: AnnExpr (S.Set String) -> Expression
 > abstract = f
 >  where
 >   f (AnnExpr (_, (App l r)))     = app (abstract l) (abstract r)
@@ -65,23 +65,23 @@ abstractions for all free variables in |e| (and an |App| as well).
 >   f (AnnExpr (_, (Def x expr)))  = def x (abstract expr)
 >   f (AnnExpr (_, (More xs)))     = more (map f xs)
 
-> addVars :: Expr -> [String] -> Expr
+> addVars :: Expression -> [String] -> Expression
 > addVars = foldl (\e -> app e . var)
 
 The state could be changed into a |Reader| for the |freshVariables| and a |Writer| for the bindings.
 
 > data CollectState = CollectState 
 >   { freshVariable :: Int
->   , bindings :: [Expr]
+>   , bindings :: [Expression]
 >   }
 
 collectSCs lifts all the lambdas to supercombinators (as described in the paper).
 
-> collectSCs :: Expr -> [Expr]
+> collectSCs :: Expression -> [Expression]
 > collectSCs e = let (e', st) = runState (collectSCs' $ out e) (CollectState 0 [])
 >                in  (In (Def "main" e')):(bindings st)
 
-> collectSCs' :: ExprF (Expr) -> State CollectState (Expr)
+> collectSCs' :: ExprF (Expression) -> State CollectState (Expression)
 > collectSCs' (App l r)      = do l' <- collectSCs' (out l)
 >                                 r' <- collectSCs' (out r)
 >                                 return (app l' r')
@@ -103,7 +103,7 @@ collectSCs lifts all the lambdas to supercombinators (as described in the paper)
 
 Some helper functions to deal with state
 
-> write :: String -> Expr -> State CollectState ()
+> write :: String -> Expression -> State CollectState ()
 > write nm expr = modify (\st -> st {bindings = (In (Def nm expr)):(bindings st)})
 
 > freshName :: State CollectState String

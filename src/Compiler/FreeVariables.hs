@@ -1,6 +1,6 @@
 module Compiler.FreeVariables
 ( FreeVarA (..)
-, ExprFV
+, ExpressionFV
 , annotateExpression
 , DefinitionFV
 , DefinitionsFV
@@ -10,7 +10,7 @@ module Compiler.FreeVariables
 where
 
 import Compiler.Generics
-import Compiler.Expr
+import Compiler.Expression
 import Control.Arrow hiding (app)
 import Data.List (intercalate)
 import Data.Set hiding (map, insert)
@@ -18,9 +18,9 @@ import Compiler.LiftDefinitions (DefinitionsA (..), Definitions, DefinitionA (..
 
 data FreeVarA f a = FreeVarA { free :: Set String , expr :: f a }
 
-type ExprFV = FixA FreeVarA ExprF
+type ExpressionFV = FixA FreeVarA ExpressionF
 
-annotateExpression :: Arrow (~>) => Set String -> Expr ~> ExprFV
+annotateExpression :: Arrow (~>) => Set String -> Expression ~> ExpressionFV
 annotateExpression globs = arr ow
   where 
   ow ex = rec ex

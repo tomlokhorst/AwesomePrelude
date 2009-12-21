@@ -5,7 +5,7 @@
   , DeriveFoldable
   , DeriveTraversable
  #-}
-module Compiler.Expr where
+module Compiler.Expression where
 
 import Compiler.Generics
 import Control.Monad.State
@@ -20,7 +20,7 @@ type Name = String
 type Var  = String
 type Body = [Var] -> String
 
-data ExprF f =
+data ExpressionF f =
     App   f f
   | Con   Con
   | Lam   [Var] f
@@ -29,7 +29,7 @@ data ExprF f =
   | Var   Var
   deriving (Functor, Foldable, Traversable)
 
-instance Eq f => Eq (ExprF f) where
+instance Eq f => Eq (ExpressionF f) where
   App   f g  == App   h i  = f == h && g == i
   Con   c    == Con   d    = c == d
   Lam   vs e == Lam   ws f = vs == ws && e == f
@@ -38,26 +38,26 @@ instance Eq f => Eq (ExprF f) where
   Var   v    == Var   w    = v == w
   _          == _          = False
 
-type ExprA a = FixA a ExprF
-type Expr    = Fix ExprF
+type ExpressionA a = FixA a ExpressionF
+type Expression    = Fix ExpressionF
 
 -- Smart constructors.
 
-app :: Expr -> Expr -> Expr
+app :: Expression -> Expression -> Expression
 app a b = In (Id (App a b))
 
-con :: Con -> Expr
+con :: Con -> Expression
 con a = In (Id (Con a))
 
-lam :: [Var] -> Expr -> Expr
+lam :: [Var] -> Expression -> Expression
 lam as f = In (Id (Lam as f))
 
-name :: Name -> Expr -> Expr
+name :: Name -> Expression -> Expression
 name a b = In (Id (Name a b))
 
-prim :: Body -> [Var] -> Expr
+prim :: Body -> [Var] -> Expression
 prim f as = In (Id (Prim f as))
 
-var :: Var -> Expr
+var :: Var -> Expression
 var a = In (Id (Var a))
 

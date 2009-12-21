@@ -1,6 +1,6 @@
 module Compiler.CommonDefinitions where
 
-import Compiler.Expr
+import Compiler.Expression
 import Compiler.Generics
 import Compiler.LiftDefinitions
 import Control.Arrow hiding (app)
@@ -19,7 +19,7 @@ eliminate1 (Def n e) ds =
       part (Def m g) = if g == e && m /= n then Left m else Right (Def m g)
   in map (\(Def m g) -> Def m (foldr (substitute1 n) g subs)) keeps
   
-substitute1 :: Var -> Var -> Expr -> Expr
+substitute1 :: Var -> Var -> Expression -> Expression
 substitute1 to from = rec
   where
     tr (App  f e ) = app (rec f) (rec e)

@@ -1,6 +1,6 @@
 module Compiler.ReindexParamaters where
 
-import Compiler.Expr
+import Compiler.Expression
 import Compiler.Generics
 import Compiler.LiftDefinitions
 import Control.Applicative hiding (empty)
@@ -17,7 +17,7 @@ reindex = arr (Defs . map one . unDefs)
   one (Def nm x) = let e = fst $ runState (rec x) (0, empty) in Def nm e
     where
 
-    tr :: ExprF Expr -> State (Integer, Map Var Integer) Expr
+    tr :: ExpressionF Expression -> State (Integer, Map Var Integer) Expression
     tr (App  f e ) = app <$> rec f <*> rec e
     tr (Con  c   ) = return (con c)
     tr (Lam  ps e) = do qs <- mapM (\p -> modify (\(c, m) -> (c + 1, insert p (c + 1) m)) >> gets (mk . fst)) ps
