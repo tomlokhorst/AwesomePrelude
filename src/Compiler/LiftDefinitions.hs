@@ -1,3 +1,5 @@
+{-# LANGUAGE StandaloneDeriving, TypeOperators, FlexibleInstances #-}
+
 module Compiler.LiftDefinitions 
 ( DefinitionA (..)
 , Definition

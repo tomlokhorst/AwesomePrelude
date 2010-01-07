@@ -7,7 +7,8 @@ description:         This alternative prelude is very much like the original
                      extensible: Bring your own boolean implementation!
 license:             BSD3
 license-file:        LICENSE
-author:              Tom Lokhorst,
+author:              Chris Eidhof,
+                     Tom Lokhorst,
                      Sebastiaan Visser
 maintainer:          Tom Lokhorst <tom@lokhorst.eu>
 homepage:            http://tom.lokhorst.eu/awesome-prelude
