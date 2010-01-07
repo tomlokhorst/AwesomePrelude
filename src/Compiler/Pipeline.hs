@@ -1,4 +1,5 @@
-{-# LANGUAGE Arrows #-}
+{-# LANGUAGE Arrows, TypeOperators #-}
+
 module Compiler.Pipeline where
 
 import Compiler.Expression

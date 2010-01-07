@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeOperators #-}
+
 module Compiler.ReindexParamaters where
 
 import Compiler.Expression

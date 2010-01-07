@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
+
 module Lang.JavaScript where
 
 import Generic.Control.Function

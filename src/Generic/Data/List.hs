@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
+
 module Generic.Data.List where
 
 import Prelude ()

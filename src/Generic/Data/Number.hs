@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Generic.Data.Number where
 
 import Prelude ()

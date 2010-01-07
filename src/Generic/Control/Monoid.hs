@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Generic.Control.Monoid where
 
 import Prelude ()

@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Generic.Data.Bool where
 
 import Prelude ()
