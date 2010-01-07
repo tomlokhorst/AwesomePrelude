@@ -20,5 +20,7 @@ exposed-modules:     AwesomePrelude,
                      HaskellPrelude,
                      JsPrelude,
                      CsPrelude
-build-depends:       base >= 3 && < 5
+build-depends:       base >= 3 && < 5,
+                     monads-fd,
+                     transformers
 
