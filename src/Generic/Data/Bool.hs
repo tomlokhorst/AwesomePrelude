@@ -4,6 +4,9 @@ module Generic.Data.Bool where
 
 import Prelude ()
 
+infixr 3  &&
+infixr 2  ||
+
 data Bool
 class BoolC j where
   false :: j Bool
