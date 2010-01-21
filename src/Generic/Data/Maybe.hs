@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE EmptyDataDecls, FlexibleInstances, MultiParamTypeClasses #-}
 
 module Generic.Data.Maybe where
 

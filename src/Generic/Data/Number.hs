@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE EmptyDataDecls, FlexibleInstances #-}
 
 module Generic.Data.Number where
 

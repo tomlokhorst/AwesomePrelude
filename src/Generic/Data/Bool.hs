@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE EmptyDataDecls, MultiParamTypeClasses #-}
 
 module Generic.Data.Bool where
 

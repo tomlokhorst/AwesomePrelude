@@ -1,3 +1,5 @@
+{-# LANGUAGE EmptyDataDecls #-}
+
 module Generic.Data.Either where
 
 import Prelude ()
