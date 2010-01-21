@@ -1,0 +1,20 @@
+SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex
+
+.PHONY : clean $(SRC:%.tex=ghci-%)
+
+ghci-% :
+	ghci -pgmL lhs2tex -optL --pre $*.lhs
+
+presentation.pdf : $(SRC)
+	latexmk -pdf -g $<
+
+%.tex : %.lhs
+	lhs2TeX -o $@ $<
+
+preview :
+	latexmk -pdf -pvc thesis
+
+clean :
+	latexmk -C
+	for file in $(SRC:%.tex=%.lhs); do if [ -e $$file ]; then rm -f $${file%lhs}tex; fi; done
+	rm -f thesis.ptb
