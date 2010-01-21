@@ -6,13 +6,27 @@ import Prelude ()
 import Generic.Data.Bool
 import Generic.Data.Eq
 import Generic.Data.Number
+import Generic.Data.Ord
 import Generic.Control.Function
 import Generic.Control.Functor
+
+-- data List a
+-- instead of `List a`, use `[a]`
 
 class ListC j where
   nil  :: j [a]
   cons :: j a -> j [a] -> j [a]
   list :: j r -> (j a -> j [a] -> j r) -> j [a] -> j r
+
+instance (BoolC j, ListC j, Eq j a) => Eq j [a] where
+  xs == ys = list (list true (\_ _ -> false) ys)
+                  (\x xs' -> list false (\y ys' -> x == y && xs' == ys') ys)
+                  xs
+
+instance (BoolC j, ListC j, Ord j a) => Ord j [a] where
+  xs <= ys = list true -- (list true (\_ _ -> true) ys)
+                  (\x xs' -> list false (\y ys' -> x <= y || xs' <= ys') ys)
+                  xs
 
 instance (FunC j, ListC j) => Functor j [] where
   fmap f = foldr (\a r -> f a `cons` r) nil
