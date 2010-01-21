@@ -21,6 +21,21 @@ library
   hs-source-dirs:    src
   extensions:        EmptyDataDecls
   exposed-modules:   Compiler.Pipeline,
+                     Generic.Control.Alternative
+                     Generic.Control.Applicative
+                     Generic.Control.Category
+                     Generic.Control.Function
+                     Generic.Control.Functor
+                     Generic.Control.Monad
+                     Generic.Control.MonadPlus
+                     Generic.Control.Monoid
+                     Generic.Control.Pointed
+                     Generic.Data.Bool
+                     Generic.Data.Either
+                     Generic.Data.List
+                     Generic.Data.Maybe
+                     Generic.Data.Number
+                     Generic.Data.Tuple
                      Generic.Prelude,
                      Lang.JavaScript
   build-depends:     base >= 3 && < 5,
