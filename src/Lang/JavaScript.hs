@@ -5,6 +5,7 @@ module Lang.JavaScript where
 import Generic.Control.Function
 import Generic.Data.Bool
 import Generic.Data.Either
+import Generic.Data.Eq
 import Generic.Data.List hiding ((++))
 import Generic.Data.Maybe
 import Generic.Data.Number

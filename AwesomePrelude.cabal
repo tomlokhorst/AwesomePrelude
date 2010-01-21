@@ -31,6 +31,7 @@ library
                      Generic.Control.Pointed
                      Generic.Data.Bool
                      Generic.Data.Either
+                     Generic.Data.Eq
                      Generic.Data.List
                      Generic.Data.Maybe
                      Generic.Data.Number

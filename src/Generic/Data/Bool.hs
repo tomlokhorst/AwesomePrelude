@@ -1,4 +1,4 @@
-{-# LANGUAGE EmptyDataDecls, MultiParamTypeClasses #-}
+{-# LANGUAGE EmptyDataDecls #-}
 
 module Generic.Data.Bool where
 
@@ -6,20 +6,19 @@ import Prelude ()
 
 data Bool
 class BoolC j where
-  true  :: j Bool
   false :: j Bool
+  true  :: j Bool
   bool  :: j a -> j a -> j Bool -> j a
 
+if' :: BoolC j => j Bool -> j a -> j a -> j a
+if' b x y = bool y x b
+
+(&&) :: BoolC j => j Bool -> j Bool -> j Bool
+x && y = bool false y x
+
+(||) :: BoolC j => j Bool -> j Bool -> j Bool
+x || y = bool y true x
+
 not :: BoolC j => j Bool -> j Bool
-not = bool false true
-
-and :: BoolC j => j Bool -> j Bool -> j Bool
-and a b = bool b false a
-
-or :: BoolC j => j Bool -> j Bool -> j Bool
-or a b = bool true b a
-
-class Eq j a where
-  (==) :: j a -> j a -> j Bool
-  (/=) :: j a -> j a -> j Bool
+not = bool true false
 

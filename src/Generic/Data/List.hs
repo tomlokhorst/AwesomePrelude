@@ -3,8 +3,9 @@
 module Generic.Data.List where
 
 import Prelude ()
-import Generic.Data.Number
 import Generic.Data.Bool
+import Generic.Data.Eq
+import Generic.Data.Number
 import Generic.Control.Function
 import Generic.Control.Functor
 
