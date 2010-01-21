@@ -1,4 +1,4 @@
-{-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE EmptyDataDecls, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
 
 module Generic.Data.Ord where
 
@@ -31,6 +31,23 @@ class OrderingC j where
   eq       :: j Ordering
   gt       :: j Ordering
   ordering :: j a -> j a -> j a -> j Ordering -> j a
+
+instance (BoolC j) => Ord j Bool where
+  x <= y = bool true -- (bool true true y)
+                (bool false true y)
+                x
+
+instance (BoolC j, OrderingC j) => Eq j Ordering where
+  x == y = ordering (ordering true  false false y)
+                    (ordering false true  false y)
+                    (ordering false false true  y)
+                    x
+
+instance (BoolC j, OrderingC j) => Ord j Ordering where
+  x <= y = ordering true -- (ordering true  true  true y)
+                    (ordering false true  true y)
+                    (ordering false false true y)
+                    x
 
 comparing :: (Ord j a, BoolC j, OrderingC j)
           => (b -> j a) -> b -> b -> j Ordering
