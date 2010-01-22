@@ -5,7 +5,7 @@ module Generic.Data.List where
 import Prelude ()
 import Generic.Data.Bool
 import Generic.Data.Eq
-import Generic.Data.Number
+import Generic.Data.Num
 import Generic.Data.Ord
 import Generic.Control.Function
 import Generic.Control.Functor
@@ -37,16 +37,16 @@ singleton a = a `cons` nil
 foldr :: (FunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
 
-replicate :: (ListC j, NumC j, Eq j Num, BoolC j, FunC j) => j Num -> j a -> j [a]
+replicate :: (ListC j, Eq j a, BoolC j, FunC j, Num j a) => j a -> j b -> j [b]
 replicate n a = fix (\r -> lam (\y -> bool nil (a `cons` (r `app` (y - 1))) (y == 0))) `app` n
 
 (++) :: (FunC j, ListC j) => j [a] -> j [a] -> j [a]
 xs ++ ys = foldr cons ys xs
 
-length :: (FunC j, NumC j, ListC j) => j [a] -> j Num
-length = foldr (\_ -> (+1)) 0
+genericLength :: (FunC j, ListC j, Num j a) => j [b] -> j a
+genericLength = foldr (\_ -> (+1)) 0
 
-sum :: (FunC j, NumC j, ListC j) => j [Num] -> j Num
+sum :: (FunC j, ListC j, Num j a) => j [a] -> j a
 sum = foldr (+) 0
 
 filter :: (ListC j, BoolC j, FunC j) => (j a -> j Bool) -> j [a] -> j [a]

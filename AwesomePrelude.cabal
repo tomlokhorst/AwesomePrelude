@@ -34,7 +34,7 @@ library
                      Generic.Data.Eq
                      Generic.Data.List
                      Generic.Data.Maybe
-                     Generic.Data.Number
+                     Generic.Data.Num
                      Generic.Data.Ord
                      Generic.Data.Tuple
                      Generic.Prelude,

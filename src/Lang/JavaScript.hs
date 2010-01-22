@@ -2,14 +2,7 @@
 
 module Lang.JavaScript where
 
-import Generic.Control.Function
-import Generic.Data.Bool
-import Generic.Data.Either
-import Generic.Data.Eq
-import Generic.Data.List hiding ((++))
-import Generic.Data.Maybe
-import Generic.Data.Number
-import Generic.Data.Tuple
+import Generic.Prelude hiding ((++))
 import Lang.Value
 import Prelude ((++))
 import qualified Prelude
@@ -32,12 +25,14 @@ instance BoolC (Val JS) where
   false = Con "false"
   bool x y z = fun3 "bool" (\[t, e, b] -> b ++ " ? " ++ t ++ "(/*force*/) : " ++ e ++ "(/*force*/)") (lam (const x)) (lam (const y)) z
 
-instance NumC (Val JS) where
+data Number
+
+instance Num (Val JS) Number where
   (+) = fun2 "add" (\[a, b] -> a ++ " + " ++ b)
   (-) = fun2 "sub" (\[a, b] -> a ++ " - " ++ b)
   (*) = fun2 "mul" (\[a, b] -> a ++ " * " ++ b)
   (/) = fun2 "div" (\[a, b] -> a ++ " / " ++ b)
-  num x = Con (Prelude.show x)
+  fromInteger x = Con (Prelude.show x)
 
 instance MaybeC (Val JS) where
   nothing   = Con "{ nothing : 1 }"
@@ -64,7 +59,7 @@ instance Eq (Val JS) Bool where
   (==) = fun2 "eq"  (\[a, b] -> a ++ " == " ++ b)
   (/=) = fun2 "neq" (\[a, b] -> a ++ " /= " ++ b)
 
-instance Eq (Val JS) Num where
+instance Eq (Val JS) Number where
   (==) = fun2 "eq"  (\[a, b] -> a ++ " == " ++ b)
   (/=) = fun2 "neq" (\[a, b] -> a ++ " /= " ++ b)
 
