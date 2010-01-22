@@ -17,8 +17,8 @@ instance NameC (Val JS) where
 
 instance FunC (Val JS) where
   lam f   = Lam f
-  app f g = App f g
   fix f   = fun1 "fix" (\[v] -> "fix = arguments.callee, " ++ v ++ "(function (i) { return fix(" ++ v ++ ")(i) })") (lam f)
+  app f g = App f g
 
 instance BoolC (Val JS) where
   true  = Con "true"

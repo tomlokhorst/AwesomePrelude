@@ -13,8 +13,8 @@ class NameC j where
 
 class NameC j => FunC j where
   lam :: (j a -> j b) -> j (a -> b)
+  fix :: (j (a -> b) -> j (a -> b)) -> j (a -> b)
   app :: j (a -> b) -> j a -> j b
-  fix :: (j a -> j a) -> j a
 
 instance FunC j => Category j (->) where
   id a      = "id" `named` (lam (\i -> i) `app` a)
