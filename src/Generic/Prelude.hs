@@ -10,9 +10,11 @@ module Generic.Prelude
 , module Generic.Control.Pointed
 , module Generic.Data.Bool
 , module Generic.Data.Either
+, module Generic.Data.Eq
 , module Generic.Data.List
 , module Generic.Data.Maybe
 , module Generic.Data.Number
+, module Generic.Data.Ord
 , module Generic.Data.Tuple
 )
 where
@@ -28,8 +30,10 @@ import Generic.Control.Monoid
 import Generic.Control.Pointed
 import Generic.Data.Bool
 import Generic.Data.Either
+import Generic.Data.Eq
 import Generic.Data.List
 import Generic.Data.Maybe
 import Generic.Data.Number
+import Generic.Data.Ord
 import Generic.Data.Tuple
 

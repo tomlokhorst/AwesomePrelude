@@ -35,6 +35,7 @@ library
                      Generic.Data.List
                      Generic.Data.Maybe
                      Generic.Data.Number
+                     Generic.Data.Ord
                      Generic.Data.Tuple
                      Generic.Prelude,
                      Lang.JavaScript

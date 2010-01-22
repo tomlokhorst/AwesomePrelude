@@ -17,6 +17,3 @@ class Eq j a where
 instance (BoolC j) => Eq j Bool where
   x == y = if' x y (not y)
 
-z :: (BoolC j) => j Bool
-z = true == false
-
