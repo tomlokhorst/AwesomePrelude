@@ -38,7 +38,9 @@ library
                      Generic.Data.Ord
                      Generic.Data.Tuple
                      Generic.Prelude,
-                     Lang.JavaScript
+                     Lang.Haskell,
+                     Lang.JavaScript,
+                     Lang.Value
   build-depends:     base >= 3 && < 5,
                      containers >= 0.3 && < 0.4,
                      monads-fd >= 0.0.0.1 && < 0.0.1,

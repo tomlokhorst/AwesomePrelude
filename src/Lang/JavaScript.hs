@@ -2,15 +2,16 @@
 
 module Lang.JavaScript where
 
+import Prelude ((++))
+import qualified Prelude as P
+
 import Generic.Prelude hiding ((++))
 import Lang.Value
-import Prelude ((++))
-import qualified Prelude
 
 data JS
 type JavaScript a = Val JS a
 
--- * JavaScript instances for AwesomePrelude datatypes.
+-- * JavaScript instances for AwesomePrelude 'data types'.
 
 instance NameC (Val JS) where
   named s a = s `Name` a
@@ -18,12 +19,12 @@ instance NameC (Val JS) where
 instance FunC (Val JS) where
   lam f   = Lam f
   fix f   = fun1 "fix" (\[v] -> "fix = arguments.callee, " ++ v ++ "(function (i) { return fix(" ++ v ++ ")(i) })") (lam f)
-  app f g = App f g
+  app f x = App f x
 
 instance BoolC (Val JS) where
-  true  = Con "true"
-  false = Con "false"
-  bool x y z = fun3 "bool" (\[t, e, b] -> b ++ " ? " ++ t ++ "(/*force*/) : " ++ e ++ "(/*force*/)") (lam (const x)) (lam (const y)) z
+  false      = Con "false"
+  true       = Con "true"
+  bool x y z = fun3 "bool" (\[f, t, b] -> b ++ " ? " ++ t ++ "(/*force*/) : " ++ f ++ "(/*force*/)") (lam (const x)) (lam (const y)) z
 
 data Number
 
@@ -32,7 +33,7 @@ instance Num (Val JS) Number where
   (-) = fun2 "sub" (\[a, b] -> a ++ " - " ++ b)
   (*) = fun2 "mul" (\[a, b] -> a ++ " * " ++ b)
   (/) = fun2 "div" (\[a, b] -> a ++ " / " ++ b)
-  fromInteger x = Con (Prelude.show x)
+  fromInteger x = Con (P.show x)
 
 instance MaybeC (Val JS) where
   nothing   = Con "{ nothing : 1 }"
