@@ -1,4 +1,4 @@
-SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex RealExpr.tex
+SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex RealExpr.tex Value.tex code.fmt
 
 .PHONY : clean $(SRC:%.tex=ghci-%)
 
@@ -7,6 +7,7 @@ ghci-% :
 
 presentation.pdf : $(SRC)
 	latexmk -pdf -g $<
+	open presentation.pdf
 
 %.tex : %.lhs
 	lhs2TeX -o $@ $<

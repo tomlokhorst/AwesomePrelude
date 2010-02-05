@@ -34,12 +34,14 @@
 
 \newcommand{\stress}[1]{\textcolor{stress}{#1}}
 
+\definecolor{subtitle}{rgb}{0.30,0.80,0.30}
+
 % -----------------------------------------------------------------------------
 
 \begin{document}
 
-\title{AwesomePrelude}
-\subtitle{``Liberating Haskell from data types!''}
+\title{\LARGE{\texttt{AWESOME PRELUDE}}}
+\subtitle{\textcolor{subtitle}{``Liberating Haskell from datatypes!''}}
 \author{Tom Lokhorst, Sebastiaan Visser} 
 \date{\today} 
 
@@ -60,6 +62,10 @@
 \include{BoolLike}
 
 \include{RealExpr}
+
+% ------------------ BREAK ---------------
+
+\include{Value}
 
 \end{document}
 
