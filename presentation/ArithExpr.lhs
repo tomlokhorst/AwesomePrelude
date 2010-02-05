@@ -1,4 +1,5 @@
 %include polycode.fmt
+%include code.fmt
 
 %if style == newcode
 

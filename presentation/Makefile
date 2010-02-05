@@ -1,4 +1,4 @@
-SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex
+SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex RealExpr.tex
 
 .PHONY : clean $(SRC:%.tex=ghci-%)
 
@@ -12,9 +12,9 @@ presentation.pdf : $(SRC)
 	lhs2TeX -o $@ $<
 
 preview :
-	latexmk -pdf -pvc thesis
+	latexmk -pdf -pvc presentation
 
 clean :
 	latexmk -C
 	for file in $(SRC:%.tex=%.lhs); do if [ -e $$file ]; then rm -f $${file%lhs}tex; fi; done
-	rm -f thesis.ptb
+	rm -f presentation.ptb

@@ -1,8 +1,9 @@
 %include polycode.fmt
+%include code.fmt
 
 %if style == newcode
 
-> {-# OPTIONS_GHC -F -pgmF lhs2tex -optF --pre #-}
+> {-# OPTIONS_GHC -F -pgmF lhs2TeX -optF --pre #-}
 
 > module BoolLike where
 > import Expr 
@@ -13,8 +14,6 @@
 \begin{frame}
 
 %if style /= newcode
-
-> (+) :: Num a => a -> a -> a
 
 > (==) :: Eq a => a -> a -> Bool
 
@@ -34,7 +33,11 @@
 >   true   :: b
 >   bool   :: a -> a -> b -> a
 
-\begin{overlayarea}{\textwidth}{0.2\textheight}
+\pause
+
+%if style /= newcode
+
+\begin{overlayarea}{\textwidth}{0.3\textheight}
 \only<2>{
 
 > instance BoolLike Bool where
@@ -45,14 +48,57 @@
 }
 \only<3>{
 
-> instance BoolLike (Expr Bool) where
+> instance BoolLike Expr where
 >   false       = ConFalse
 >   true        = ConTrue
 >   bool x y b  = If b y x
 
 }
 \end{overlayarea}
- 
+
+%endif
+
 \end{frame}
 
+\begin{frame}
+
+%if style /= newcode
+
+> (&&)  :: Bool -> Bool -> Bool
+> (||)  :: Bool -> Bool -> Bool
+> not   :: Bool -> Bool
+
+
+\pause
+
+\begin{overlayarea}{\textwidth}{0.5\textheight}
+\only<2>{
+
+> (&&)  :: BoolLike b => b -> b -> b
+> WhiteSpace
+
+> (||)  :: BoolLike b => b -> b -> b
+> WhiteSpace
+
+> not   :: BoolLike b => b -> b
+> WhiteSpace
+
+}
+\only<3>{
+
+> (&&)  :: BoolLike b => b -> b -> b
+> (&&) x y = bool x y x
+
+> (||)  :: BoolLike b => b -> b -> b
+> (||) x y = bool y x x
+
+> not   :: BoolLike b => b -> b
+> not x = bool true false x
+
+}
+\end{overlayarea}
+
+%endif
+
+\end{frame}
 

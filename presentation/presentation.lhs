@@ -6,6 +6,13 @@
 %include polycode.fmt
 %include code.fmt
 
+%if style == newcode
+
+> {-# OPTIONS_GHC -F -pgmF lhs2TeX -optF --pre #-}
+
+%endif
+
+
 \setbeamersize{text margin left=.5cm}
 \setbeamersize{text margin right=.5cm}
 \setbeamertemplate{navigation symbols}{}
@@ -46,11 +53,13 @@
 
 \end{frame}
 
-%include ArithExpr.lhs
+\include{ArithExpr}
 
-%include Expr.lhs
+\include{Expr}
 
-%include BoolLike.lhs
+\include{BoolLike}
+
+\include{RealExpr}
 
 \end{document}
 
