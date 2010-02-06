@@ -60,6 +60,7 @@
 
 \end{frame}
 
+
 \begin{frame}
 
 %if style /= newcode
@@ -97,6 +98,28 @@
 
 }
 \end{overlayarea}
+
+%endif
+
+\end{frame}
+
+
+\begin{frame}
+
+%if style /= newcode
+
+\begin{verbatim}
+
+ghci> :t not
+not :: (BoolLike b) => b -> b
+
+ghci> not True
+False
+
+ghci> not ConTrue
+If ConTrue ConFalse ConTrue
+
+\end{verbatim}
 
 %endif
 
