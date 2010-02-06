@@ -67,5 +67,7 @@
 
 \include{Value}
 
+\include{Conclusion}
+
 \end{document}
 

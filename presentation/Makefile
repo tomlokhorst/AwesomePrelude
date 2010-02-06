@@ -1,4 +1,4 @@
-SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex RealExpr.tex Value.tex code.fmt
+SRC = presentation.tex ArithExpr.tex Expr.tex BoolLike.tex RealExpr.tex Value.tex Conclusion.tex code.fmt
 
 .PHONY : clean $(SRC:%.tex=ghci-%)
 

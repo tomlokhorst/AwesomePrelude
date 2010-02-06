@@ -109,16 +109,16 @@ ghci> (runHaskell test) 3
 
 \begin{frame}
 
-> test  :: (NumC j, ListC j, Eq j Num, BoolC j, FunC j, MaybeC j)
->       => j (Num -> Num)
+> test  :: JavaScript (Num -> Num)
 > test  =  lam (\x  ->  sum (replicate 3 (2 * 8) ++ replicate 3 8)
 >                   *   maybe 4 (*8) (just (x - 2)))
 
+\pause
 \Large{
 \textcolor{cmnt}{
 \begin{verbatim}
-ghci> compiler test >>= writeFile "test.js"
-done
+ghci> Js.compiler test >>=
+      writeFile "test.js"
 \end{verbatim}
 }
 }
