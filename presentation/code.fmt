@@ -1,18 +1,46 @@
+\definecolor{keyword}{rgb}{0.20,0.60,1.00} 
 
-%format module      = "\stress{\textbf{module}}"
-%format where       = "\stress{\textbf{where}}"
-%format import      = "\stress{\textbf{import}}"
-%format instance    = "\stress{\textbf{instance}}"
-%format class       = "\stress{\textbf{class}}"
-%format data        = "\stress{\textbf{data}}"
-%format if          = "\stress{\textbf{if}}"
-%format then        = "\stress{\textbf{then}}"
-%format else        = "\stress{\textbf{else}}"
-%format let         = "\stress{\textbf{let}}"
-%format in          = "\stress{\textbf{in}}"
+%format type        = "\textcolor{keyword}{\textbf{type}}"
+%format module      = "\textcolor{keyword}{\textbf{module}}"
+%format where       = "\textcolor{keyword}{\textbf{where}}"
+%format import      = "\textcolor{keyword}{\textbf{import}}"
+%format instance    = "\textcolor{keyword}{\textbf{instance}}"
+%format class       = "\textcolor{keyword}{\textbf{class}}"
+%format data        = "\textcolor{keyword}{\textbf{data}}"
+%format if          = "\textcolor{keyword}{\textbf{if}}"
+%format then        = "\textcolor{keyword}{\textbf{then}}"
+%format else        = "\textcolor{keyword}{\textbf{else}}"
+%format let         = "\textcolor{keyword}{\textbf{let}}"
+%format in          = "\textcolor{keyword}{\textbf{in}}"
 %format ==          = "=="
 %format &&          = "\&\&"
 %format ||          = "||"
 %format not         = "not"
 %format WhiteSpace  = "\;"
+
+\definecolor{cmnt}{rgb}{0.30,0.80,0.30} 
+%subst comment a = "\textcolor{cmnt}{\text{\tt-- " a "}}"
+
+\definecolor{strlit}{rgb}{1.00,0.40,0.20} 
+%subst string a = "\textcolor{strlit}{\text{\tt\char34" a "\char34}}"
+
+\definecolor{numlit}{rgb}{1.00,0.20,0.20} 
+%subst numeral a = "\textcolor{numlit}{\text{" a "}}"
+
+\definecolor{sym}{rgb}{1.00,0.70,0.30} 
+%format \           = "\textcolor{sym}{\text{$\lambda$}}"
+%format ->          = "\textcolor{sym}{\text{\ $\to$\ }}"
+%format =           = "\textcolor{sym}{\text{\ =\ }}"
+%format ++          = "\textcolor{sym}{\text{\ \tt{++}\ }}"
+%format ::          = "\textcolor{sym}{\text{\ ::\ }}"
+%format *           = "\textcolor{sym}{\text{\ \tt{*}\ }}"
+%format +           = "\textcolor{sym}{\text{\ \tt{+}\ }}"
+%format -           = "\textcolor{sym}{\text{\ \tt{-}\ }}"
+%format ==          = "\textcolor{sym}{\text{\ \tt{==}\ }}"
+%format =>          = "\textcolor{sym}{\text{\ $\Rightarrow$\ }}"
+%format &&          = "\textcolor{sym}{\text{\ $\land$\ }}"
+%format ||          = "\textcolor{sym}{\text{\ $\lor$\ }}"
+%format :->         = "\textcolor{sym}{\text{\ $\mapsto$\ }}"
+%format .           = "\textcolor{sym}{\text{\ $\circ$\ }}"
+%format $           = "\textcolor{sym}{\text{\ $\$$\ }}"
 
