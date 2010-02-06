@@ -89,3 +89,14 @@
 
 \end{frame}
 
+% -----------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{EXAMPLE, HASKELL}
+
+> test :: JavaScript (Num -> Num)
+> test = lam (\x ->  sum (replicate 3 (2 * 8) ++ replicate 3 8)
+>                    * maybe 4 (*8) (just (x - 2)))
+
+\end{frame}
+

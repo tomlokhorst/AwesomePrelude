@@ -21,15 +21,25 @@
 \definecolor{cmnt}{rgb}{0.30,0.80,0.30} 
 %subst comment a = "\textcolor{cmnt}{\text{\tt-- " a "}}"
 
-\definecolor{strlit}{rgb}{1.00,0.20,0.20} 
-%subst string a = "\textcolor{strlit}{\text{\tt\char34 " a "\char34}}"
+\definecolor{strlit}{rgb}{1.00,0.40,0.20} 
+%subst string a = "\textcolor{strlit}{\text{\tt\char34" a "\char34}}"
+
+\definecolor{numlit}{rgb}{1.00,0.20,0.20} 
+%subst numeral a = "\textcolor{numlit}{\text{" a "}}"
 
 \definecolor{sym}{rgb}{1.00,0.70,0.30} 
 %format \           = "\textcolor{sym}{\text{$\lambda$}}"
 %format ->          = "\textcolor{sym}{\text{\ $\to$\ }}"
 %format =           = "\textcolor{sym}{\text{\ =\ }}"
-%format ++          = "\textcolor{sym}{\text{\ ++\ }}"
+%format ++          = "\textcolor{sym}{\text{\ \tt{++}\ }}"
 %format ::          = "\textcolor{sym}{\text{\ ::\ }}"
+%format *           = "\textcolor{sym}{\text{\ \tt{*}\ }}"
+%format +           = "\textcolor{sym}{\text{\ \tt{+}\ }}"
+%format -           = "\textcolor{sym}{\text{\ \tt{-}\ }}"
+%format ==          = "\textcolor{sym}{\text{\ \tt{==}\ }}"
+%format =>          = "\textcolor{sym}{\text{\ $\Rightarrow$\ }}"
+%format &&          = "\textcolor{sym}{\text{\ $\land$\ }}"
+%format ||          = "\textcolor{sym}{\text{\ $\lor$\ }}"
 %format :->         = "\textcolor{sym}{\text{\ $\mapsto$\ }}"
 %format .           = "\textcolor{sym}{\text{\ $\circ$\ }}"
 %format $           = "\textcolor{sym}{\text{\ $\$$\ }}"
