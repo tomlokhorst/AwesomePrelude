@@ -74,6 +74,8 @@
 > type Code = String
 
 > compiler :: JavaScript a -> Code
+
+\pause
 > compiler = runKleisli
 >   $ ( Lambdas.instantiate      :: JavaScript a   :-> Expression     )
 >   . ( Defs.lift                :: Expression     :-> Definitions    )
@@ -90,8 +92,7 @@
 
 \begin{frame}
 
-> test  :: (NumC j, ListC j, Eq j Num, BoolC j, FunC j, MaybeC j)
->       => j (Num -> Num)
+> test  :: Haskell (Num -> Num)
 > test  =  lam (\x  ->  sum (replicate 3 (2 * 8) ++ replicate 3 8)
 >                   *   maybe 4 (*8) (just (x - 2)))
 

@@ -101,7 +101,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 }
 \only<2>{
@@ -112,7 +112,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -126,7 +126,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -142,7 +142,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -159,7 +159,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -177,7 +177,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -197,7 +197,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -218,7 +218,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
@@ -240,7 +240,7 @@
 > class BoolC j where
 >   false  :: j Bool
 >   true   :: j Bool
->   bool   :: j r -> j r -> j BoolD -> j r
+>   bool   :: j r -> j r -> j Bool -> j r
 
 > data Maybe a
 > 
