@@ -108,6 +108,7 @@
 
 %if style /= newcode
 
+\textcolor{cmnt}{
 \begin{verbatim}
 
 ghci> :t not
@@ -120,6 +121,7 @@ ghci> not ConTrue
 If ConTrue ConFalse ConTrue
 
 \end{verbatim}
+}
 
 %endif
 

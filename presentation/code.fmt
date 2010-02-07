@@ -18,7 +18,7 @@
 %format not         = "not"
 %format WhiteSpace  = "\;"
 
-\definecolor{cmnt}{rgb}{0.30,0.80,0.30} 
+\definecolor{cmnt}{rgb}{0.30,1.00,0.30} 
 %subst comment a = "\textcolor{cmnt}{\text{\tt-- " a "}}"
 
 \definecolor{strlit}{rgb}{1.00,0.40,0.20} 

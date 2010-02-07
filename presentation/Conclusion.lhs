@@ -55,6 +55,8 @@
 
 \begin{itemize}
 
+\item Syntactic front-end.
+
 \begin{item}
   Additional computational contexts:
   \begin{itemize}
@@ -65,7 +67,7 @@
   \end{itemize}
 \end{item}
 
-\item Syntactic front-end.
+\item Generic derivation of instances.
 
 \end{itemize}
 
