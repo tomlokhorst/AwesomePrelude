@@ -14,14 +14,13 @@
 
 %if style /= newcode
 
-> if 2 + 3 == 5
-> then  1
-> else  0
+\center{\huge{$\mathrm{if}\; 2 + 3 \equiv 5\;\; \mathrm{then}\; 1\;\; \mathrm{else}\; 0$}}
 
 %endif
 
 \pause
 
+> WhiteSpace
 > data Expr where
 >   Con       ::  Int   ->  Expr
 >   Add       ::  Expr  ->  Expr  ->  Expr 
@@ -59,9 +58,7 @@
 
 %if style /= newcode
 
-> if 2 + 3 == 5
-> then  1
-> else  0
+\center{\huge{$\mathrm{if}\; 2 + 3 \equiv 5\;\; \mathrm{then}\; 1\;\; \mathrm{else}\; 0$}}
 
 \pause
 
