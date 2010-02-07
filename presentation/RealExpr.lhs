@@ -5,7 +5,7 @@
 
 > {-# OPTIONS_GHC -F -pgmF lhs2tex -optF --pre #-}
 
-> module Expr where
+> module RealExpr where
 
 %endif
 
@@ -115,6 +115,7 @@
 > data Maybe a
 > 
 > class MaybeC j where
+
 }
 \only<3>{
 

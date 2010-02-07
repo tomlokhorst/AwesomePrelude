@@ -36,7 +36,7 @@
 %format *           = "\textcolor{sym}{\text{\ \tt{*}\ }}"
 %format +           = "\textcolor{sym}{\text{\ \tt{+}\ }}"
 %format -           = "\textcolor{sym}{\text{\ \tt{-}\ }}"
-%format ==          = "\textcolor{sym}{\text{\ $\equiv$\ }}"
+%format ==          = "\textcolor{sym}{\text{\ \tt{==}\ }}"
 %format =>          = "\textcolor{sym}{\text{\ $\Rightarrow$\ }}"
 %format &&          = "\textcolor{sym}{\text{$\&\&$}}"
 %format ||          = "\textcolor{sym}{\text{$||$}}"
