@@ -95,7 +95,6 @@
 \begin{overlayarea}{\textwidth}{1.0\textheight}
 \only<1>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -106,7 +105,6 @@
 }
 \only<2>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -120,7 +118,6 @@
 }
 \only<3>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -136,7 +133,6 @@
 }
 \only<4>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -153,7 +149,6 @@
 }
 \only<5>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -171,7 +166,6 @@
 }
 \only<6>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -191,7 +185,6 @@
 }
 \only<7>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -212,7 +205,6 @@
 }
 \only<8>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -234,7 +226,6 @@
 }
 \only<9>{
 
-> WhiteSpace
 > data Bool
 > 
 > class BoolC j where
@@ -264,44 +255,64 @@
 
 \begin{frame}
 
-test
+%if style /= newcode
+
+\begin{overlayarea}{\textwidth}{0.3\textheight}
+\only<1>{
+
+> class FunC j where
+
+}
+\only<2>{
+
+> class FunC j where
+>   lam  :: (j a -> j b) -> j (a -> b)
+
+}
+\only<3>{
+
+> class FunC j where
+>   lam  :: (j a -> j b) -> j (a -> b)
+>   WhiteSpace
+>   app  :: j (a -> b) -> j a -> j b
+
+}
+\only<4>{
+
+> class FunC j where
+>   lam  :: (j a -> j b) -> j (a -> b)
+>   fix  :: (j (a -> b) -> j (a -> b)) -> j (a -> b)
+>   app  :: j (a -> b) -> j a -> j b
+
+}
+\end{overlayarea}
+
+%endif
+
+
+\end{frame}
+
+
+\begin{frame}
 
 %if style /= newcode
 
-> if 2 + 3 == 5
-> then  1
-> else  0
+> foldr  :: (a -> b -> b) -> b -> [a] -> b
 
 \pause
 
+> foldr  :: (FunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
+> foldr f b xs =  fix (\r -> lam (list b (\y ys -> f y (r `app` ys))))
+>                 `app` xs
+
+\pause
+
+> jsFoldr  :: (JavaScript a -> JavaScript b -> JavaScript b) -> JavaScript b
+>          -> JavaScript [a] -> JavaScript b
+> jsFoldr = foldr
 
 %endif
 
-%if style == newcode
-
-> instance Show (Expr a) where
->   show (Con x)     = "Con " ++ show x
->   show (Add x y)   = "Add (" ++ show x ++ ") (" ++ show y ++ ")"
->   show (Mul x y)   = "Mul (" ++ show x ++ ") (" ++ show y ++ ")"
->   show (ConFalse)  = "ConFalse"
->   show (ConTrue)   = "ConTrue"
->   show (Eq x y)    = "Eq (" ++ show x ++ ") (" ++ show y ++ ")"
->   show (If p x y)  = "If (" ++ show p ++ ") (" ++ show x ++ ") (" ++ show y ++ ")"
-
-> instance Eq (Expr a) where
->   Con x   == Con y     = x == y
->   Add x y == Add x' y' = x == x' && y == y'
->   Mul x y == Mul x' y' = x == x' && y == y'
->   _       == _         = False
-
-> instance Num (Expr Int) where
->   fromInteger  =  Con . fromIntegral
->   x  +  y      =  Add x y
->   x  *  y      =  Mul x y
->   abs          =  undefined
->   signum       =  undefined
-
-%endif
 
 \end{frame}
 
