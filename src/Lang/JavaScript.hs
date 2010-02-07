@@ -11,6 +11,7 @@ import Lang.Value
 data JS
 type JavaScript a = Val JS a
 
+
 -- * JavaScript instances for AwesomePrelude 'data types'.
 
 instance NameC (Val JS) where
@@ -25,15 +26,6 @@ instance BoolC (Val JS) where
   false      = Con "false"
   true       = Con "true"
   bool x y z = fun3 "bool" (\[f, t, b] -> b ++ " ? " ++ t ++ "(/*force*/) : " ++ f ++ "(/*force*/)") (lam (const x)) (lam (const y)) z
-
-data Number
-
-instance Num (Val JS) Number where
-  (+) = fun2 "add" (\[a, b] -> a ++ " + " ++ b)
-  (-) = fun2 "sub" (\[a, b] -> a ++ " - " ++ b)
-  (*) = fun2 "mul" (\[a, b] -> a ++ " * " ++ b)
-  (/) = fun2 "div" (\[a, b] -> a ++ " / " ++ b)
-  fromInteger x = Con (P.show x)
 
 instance MaybeC (Val JS) where
   nothing   = Con "{ nothing : 1 }"
@@ -54,7 +46,16 @@ instance ListC (Val JS) where
   cons        = fun2 "cons" (\[x, xs] -> "{ head : " ++ x ++ ", tail : " ++ xs ++ " }")
   list b f    = fun3 "list" (\[n, c, xs] -> xs ++ ".nil ? " ++ n ++ " : " ++ c ++ "(" ++ xs ++ ".head)(" ++ xs ++ ".tail)") b (lam2 f)
 
+
 -- * JavaScript instances of AwesomePrelude type classes.
+
+data Number
+
+instance Num (Val JS) Number where
+  (+) = fun2 "add" (\[a, b] -> a ++ " + " ++ b)
+  (-) = fun2 "sub" (\[a, b] -> a ++ " - " ++ b)
+  (*) = fun2 "mul" (\[a, b] -> a ++ " * " ++ b)
+  fromInteger x = Con (P.show x)
 
 instance Eq (Val JS) Bool where
   (==) = fun2 "eq"  (\[a, b] -> a ++ " == " ++ b)
