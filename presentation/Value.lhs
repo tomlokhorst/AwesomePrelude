@@ -30,10 +30,6 @@
 
 \begin{frame}
 
-> instance FunC JavaScript where
->   lam  f    = Lam  f
->   app  f g  = App  f g
-
 > instance BoolC JavaScript where
 >
 >   -- constructors:
@@ -47,7 +43,13 @@
 
 \end{frame}
 
-% -----------------------------------------------------------------------------
+\begin{frame}
+
+> instance FunC JavaScript where
+>   lam  f    = Lam  f
+>   app  f g  = App  f g
+
+\end{frame}
 
 \begin{frame}
 
@@ -74,8 +76,6 @@
 > type Code = String
 
 > compiler :: JavaScript a -> Code
-
-\pause
 > compiler = runKleisli
 >   $ ( Lambdas.instantiate      :: JavaScript a   :-> Expression     )
 >   . ( Defs.lift                :: Expression     :-> Definitions    )

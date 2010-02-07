@@ -43,6 +43,8 @@
 \item Explicit lifting of function application and recursion.
 \item Type signatures with big contexts.
 \item No sugar for pattern matching, let bindings, if-then-else.
+\item Reimplementing the entire Haskell Prelude.
+\item Lots of manual instances for every datatype and context.
 
 \end{itemize}
 
@@ -56,18 +58,18 @@
 \begin{itemize}
 
 \item Syntactic front-end.
-
 \begin{item}
   Additional computational contexts:
   \begin{itemize}
-  \item Strict Haskell
-  \item Functional Reactive Haskell
-  \item Profiling support
-  \item C, Objective-C, C\tt{\#}, etc...
+  \item Strict Haskell.
+  \item Functional Reactive Haskell.
+  \item Profiling support.
+  \item C, Objective-C, C\#, etc...
   \end{itemize}
 \end{item}
-
 \item Generic derivation of instances.
+\item Improved optimizing compiler.
+\item Single computation over different contexts.
 
 \end{itemize}
 
