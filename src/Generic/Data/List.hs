@@ -52,3 +52,8 @@ sum = foldr (+) 0
 filter :: (ListC j, BoolC j, FunC j) => (j a -> j Bool) -> j [a] -> j [a]
 filter p = foldr (\x xs -> bool xs (x `cons` xs) (p x)) nil
 
+reverse :: (FunC j, ListC j) => j [a] -> j [a]
+reverse l = rev `app` l `app` nil
+  where
+    rev = fix (\r -> lam (\xs -> lam (\a -> list a (\y ys -> r `app` ys `app` (y `cons` a)) xs)))
+
