@@ -34,6 +34,9 @@ instance (RecFunC j, ListC j) => Functor j [] where
 singleton :: ListC j => j a -> j [a]
 singleton a = a `cons` nil
 
+map :: (ListC j, RecFunC j) => (j a -> j b) -> j [a] -> j [b]
+map f = foldr (\y ys -> f y `cons` ys) nil
+
 foldr :: (RecFunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
 
