@@ -33,6 +33,6 @@ instance (FunC j, MaybeC j) => Functor j Maybe where
 fromMaybe :: MaybeC j => j a -> j (Maybe a) -> j a
 fromMaybe d m = maybe d (\a -> a) m
 
-catMaybes :: (FunC j, ListC j, MaybeC j) => j [Maybe a] -> j [a]
+catMaybes :: (RecFunC j, ListC j, MaybeC j) => j [Maybe a] -> j [a]
 catMaybes = foldr (\a b -> maybe nil singleton a ++ b) nil
 

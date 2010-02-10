@@ -20,8 +20,10 @@ type instance H (a -> b) = H a -> H b
 
 instance FunC Haskell where
   lam f             = Hs (\x -> runHaskell (f (Hs x)))
-  fix f             = f (fix f)
   app (Hs f) (Hs x) = Hs (f x)
+
+instance RecFunC Haskell where
+  fix f             = f (fix f)
 
 type instance H Bool = P.Bool
 

@@ -28,35 +28,35 @@ instance (BoolC j, ListC j, Ord j a) => Ord j [a] where
                   (\x xs' -> list false (\y ys' -> x <= y || xs' <= ys') ys)
                   xs
 
-instance (FunC j, ListC j) => Functor j [] where
+instance (RecFunC j, ListC j) => Functor j [] where
   fmap f = foldr (\a r -> f a `cons` r) nil
 
 singleton :: ListC j => j a -> j [a]
 singleton a = a `cons` nil
 
-foldr :: (FunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
+foldr :: (RecFunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
 
-replicate :: (ListC j, Eq j a, BoolC j, FunC j, Num j a) => j a -> j b -> j [b]
+replicate :: (Eq j a, BoolC j, RecFunC j, ListC j, Num j a) => j a -> j b -> j [b]
 replicate n a = fix (\r -> lam (\y -> bool nil (a `cons` (r `app` (y - 1))) (y == 0))) `app` n
 
-(++) :: (FunC j, ListC j) => j [a] -> j [a] -> j [a]
+(++) :: (RecFunC j, ListC j) => j [a] -> j [a] -> j [a]
 xs ++ ys = foldr cons ys xs
 
-genericLength :: (FunC j, ListC j, Num j a) => j [b] -> j a
+genericLength :: (RecFunC j, ListC j, Num j a) => j [b] -> j a
 genericLength = foldr (\_ -> (+1)) 0
 
-sum :: (FunC j, ListC j, Num j a) => j [a] -> j a
+sum :: (RecFunC j, ListC j, Num j a) => j [a] -> j a
 sum = foldr (+) 0
 
-filter :: (ListC j, BoolC j, FunC j) => (j a -> j Bool) -> j [a] -> j [a]
+filter :: (BoolC j, RecFunC j, ListC j) => (j a -> j Bool) -> j [a] -> j [a]
 filter p = foldr (\x xs -> bool xs (x `cons` xs) (p x)) nil
 
-reverse :: (FunC j, ListC j) => j [a] -> j [a]
+reverse :: (RecFunC j, ListC j) => j [a] -> j [a]
 reverse l = rev `app` l `app` nil
   where
     rev = fix (\r -> lam (\xs -> lam (\a -> list a (\y ys -> r `app` ys `app` (y `cons` a)) xs)))
 
-and :: (BoolC j, FunC j, ListC j) => j [Bool] -> j Bool
+and :: (BoolC j, RecFunC j, ListC j) => j [Bool] -> j Bool
 and = foldr (&&) true
 

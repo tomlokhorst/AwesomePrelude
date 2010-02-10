@@ -19,8 +19,10 @@ instance NameC (Val JS) where
 
 instance FunC (Val JS) where
   lam f   = Lam f
-  fix f   = fun1 "fix" (\[v] -> "fix = arguments.callee, " ++ v ++ "(function (i) { return fix(" ++ v ++ ")(i) })") (lam f)
   app f x = App f x
+
+instance RecFunC (Val JS) where
+  fix f   = fun1 "fix" (\[v] -> "fix = arguments.callee, " ++ v ++ "(function (i) { return fix(" ++ v ++ ")(i) })") (lam f)
 
 instance BoolC (Val JS) where
   false      = Con "false"
