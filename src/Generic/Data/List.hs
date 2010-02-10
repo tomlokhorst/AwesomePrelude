@@ -57,3 +57,6 @@ reverse l = rev `app` l `app` nil
   where
     rev = fix (\r -> lam (\xs -> lam (\a -> list a (\y ys -> r `app` ys `app` (y `cons` a)) xs)))
 
+and :: (BoolC j, FunC j, ListC j) => j [Bool] -> j Bool
+and = foldr (&&) true
+
