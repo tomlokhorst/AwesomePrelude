@@ -1,4 +1,4 @@
-{-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE EmptyDataDecls, TypeFamilies #-}
 
 module Generic.Data.Bool where
 
@@ -9,6 +9,7 @@ infixr 2  ||
 
 data Bool
 class BoolC j where
+  type Language j :: *
   false :: j Bool
   true  :: j Bool
   bool  :: j a -> j a -> j Bool -> j a

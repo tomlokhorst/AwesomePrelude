@@ -1,5 +1,5 @@
 name:                AwesomePrelude
-version:             0.1.0
+version:             0.2.0
 synopsis:            Alternative Prelude, for designing deeply embedded DSLs
 description:         This alternative prelude is very much like the original
                      Haskell Prelude, except that all data types have been
