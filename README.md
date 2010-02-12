@@ -8,7 +8,7 @@ Background information
 ----------------------
 
  * The blog post "[Deeply embedded DSLs in Haskell](http://tom.lokhorst.eu/2009/09/deeply-embedded-dsls)" from september 2009 explains some of the ideas behind the AwesomePrelude, however the implementation of the AwesomePrelude is radically different now.
- * At the february meeting of the Dutch Haskell User Group, Tom and Sebastiaan presented the current state of the project. See [the video recording](http://tom.lokhorst.eu/2010/02/awesomeprelude-presentation-video) of that presentation.
+ * At the february 2010 meeting of the Dutch Haskell User Group, Tom and Sebastiaan presented the current state of the project. See [the video recording](http://tom.lokhorst.eu/2010/02/awesomeprelude-presentation-video) of that presentation.
 
 Authors
 -------
