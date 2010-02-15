@@ -19,3 +19,5 @@ clean :
 	latexmk -C
 	for file in $(SRC:%.tex=%.lhs); do if [ -e $$file ]; then rm -f $${file%lhs}tex; fi; done
 	rm -f presentation.ptb
+	rm -f presentation.nav
+	rm -f presentation.snm
