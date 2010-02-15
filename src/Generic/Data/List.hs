@@ -63,3 +63,6 @@ reverse l = rev `app` l `app` nil
 and :: (BoolC j, RecFunC j, ListC j) => j [Bool] -> j Bool
 and = foldr (&&) true
 
+or :: (BoolC j, RecFunC j, ListC j) => j [Bool] -> j Bool
+or = foldr (||) true
+
