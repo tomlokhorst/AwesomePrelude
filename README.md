@@ -13,6 +13,9 @@ Background information
 Authors
 -------
 
- * Chris Eidhof
  * Tom Lokhorst
  * Sebastiaan Visser
+
+ Additional contributions by:
+
+ * Chris Eidhof
