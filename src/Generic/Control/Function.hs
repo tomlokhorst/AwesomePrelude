@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, UndecidableInstances #-}
 
 module Generic.Control.Function where
 
@@ -11,9 +11,17 @@ undefined = Prelude.undefined
 class NameC j where
   named :: Prelude.String -> j a -> j a
 
-class NameC j => FunC j where
+class NameC j => LamFunC j where
   lam :: (j a -> j b) -> j (a -> b)
+
+class NameC j => AppFunC j where
   app :: j (a -> b) -> j a -> j b
+
+class (NameC j, LamFunC j, AppFunC j) => FunC j
+
+instance (NameC j, LamFunC j, AppFunC j) => FunC j
+-- Not a fan of UndecidableInstances (then again, who is), but this sorta works
+-- http://martijn.van.steenbergen.nl/journal/2009/10/11/context-synonyms/
 
 class FunC j => RecFunC j where
   fix :: (j (a -> b) -> j (a -> b)) -> j (a -> b)

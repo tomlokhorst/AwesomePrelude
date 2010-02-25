@@ -17,8 +17,10 @@ type JavaScript a = Val JS a
 instance NameC (Val JS) where
   named s a = s `Name` a
 
-instance FunC (Val JS) where
+instance LamFunC (Val JS) where
   lam f   = Lam f
+
+instance AppFunC (Val JS) where
   app f x = App f x
 
 instance RecFunC (Val JS) where

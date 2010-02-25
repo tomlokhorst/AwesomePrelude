@@ -18,8 +18,10 @@ instance NameC Haskell where
 
 type instance H (a -> b) = H a -> H b
 
-instance FunC Haskell where
+instance LamFunC Haskell where
   lam f             = Hs (\x -> runHaskell (f (Hs x)))
+
+instance AppFunC Haskell where
   app (Hs f) (Hs x) = Hs (f x)
 
 instance RecFunC Haskell where
