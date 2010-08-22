@@ -40,6 +40,9 @@ map f = foldr (\y ys -> f y `cons` ys) nil
 foldr :: (RecFunC j, ListC j) => (j a -> j b -> j b) -> j b -> j [a] -> j b
 foldr f b xs = fix (\r -> lam (list b (\y ys -> f y (r `app` ys)))) `app` xs
 
+foldr' :: (RecFunC j, ListC j) => j (a -> b -> b) -> j b -> j [a] -> j b
+foldr' f b xs = fix (\r -> lam (list b (\y ys -> f `app` y `app` (r `app` ys)))) `app` xs
+
 replicate :: (Eq j a, BoolC j, RecFunC j, ListC j, Num j a) => j a -> j b -> j [b]
 replicate n a = fix (\r -> lam (\y -> bool nil (a `cons` (r `app` (y - 1))) (y == 0))) `app` n
 
