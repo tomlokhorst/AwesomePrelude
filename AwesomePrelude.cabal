@@ -43,6 +43,5 @@ library
                      Lang.Value
   build-depends:     base >= 3 && < 5,
                      containers >= 0.3 && < 0.4,
-                     monads-fd >= 0.0.0.1 && < 0.0.1,
-                     transformers >= 0.1.4 && < 0.1.5
+                     mtl >= 2.0 && < 2.1
 
